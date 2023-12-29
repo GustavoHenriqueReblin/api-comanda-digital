@@ -14,8 +14,8 @@ const userType = userGql`
     }
 
     type Query {
-        users: [User!]!,
-        user(input: UserInput!): User!
+        users: [User!],
+        user(input: UserInput!): User
     }
 
     type Mutation {
