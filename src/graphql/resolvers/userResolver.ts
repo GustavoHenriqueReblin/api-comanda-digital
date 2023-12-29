@@ -1,4 +1,5 @@
 import { fakeUserData } from '../../model/userModel';
+import { VerifyUserToken } from '../../helper';
 
 const userResolver = {
     Query: {
@@ -7,7 +8,8 @@ const userResolver = {
         },
         user: (_: any, { input }: any) => {
             const { username, password } = input;
-            return fakeUserData.find(user => user.username === username && user.password === password) || null;
+            const user = fakeUserData.find(user => user.username === username && user.password === password);
+            return VerifyUserToken(user);
         },
     },
 
