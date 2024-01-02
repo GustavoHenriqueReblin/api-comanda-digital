@@ -6,6 +6,6 @@ const userResolver = {
             return fakeCategoryData;
         }
     }
-  };
+};
   
-  module.exports = userResolver;
+module.exports = userResolver;
