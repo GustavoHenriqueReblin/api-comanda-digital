@@ -9,8 +9,12 @@ const productType = productGql`
         description: String!
     }
 
+    input FilterInput {
+        idCategory: Int
+    }
+
     type Query {
-        products: [Product!],
+        products(filter: FilterInput): [Product!],
     }
 `;
 
