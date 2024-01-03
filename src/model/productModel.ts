@@ -8,5 +8,6 @@ export const fakeProductData: Product[] = [
     { id: 5, idCategory: 2, name: "Suco de laranja 800ml", price: 18.99, description: 'Cenoura, rúcula e brócolis' },
     { id: 6, idCategory: 2, name: "Coca-cola 600ml", price: 11.5, description: 'Caçador de estrelas em noites serenas.' },
     { id: 7, idCategory: 1, name: "X-Frango", price: 8, description: 'Arquiteto de risos, construindo pontes de alegria.' },
-    { id: 8, idCategory: 2, name: "Cerveja Heineken 700ml", price: 16.00, description: 'Dançarino de palavras, criando poesia nos espaços em branco.' }
+    { id: 8, idCategory: 2, name: "Cerveja Heineken 700ml", price: 16.00, description: 'Dançarino de palavras, criando poesia nos espaços em branco.' },
+    { id: 9, idCategory: 3, name: "Torta de limão", price: 42.00, description: 'Bem top.' }
 ];
