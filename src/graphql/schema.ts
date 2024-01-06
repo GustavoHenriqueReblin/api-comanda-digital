@@ -5,6 +5,8 @@ const categoryResolver = require('./resolvers/categoryResolver');
 const categoryTypeSchema = require('./types/categoryType');
 const productResolver = require('./resolvers/productResolver');
 const productTypeSchema = require('./types/productType');
+const tableResolver = require('./resolvers/tableResolver');
+const tableTypes = require('./types/tableTypes');
 
 const rootSchema = schemaGql`
     type Query {
@@ -17,8 +19,12 @@ const rootSchema = schemaGql`
 `;
 
 const schema = {
-    typeDefs: [userTypeSchema, categoryTypeSchema, productTypeSchema],
-    resolvers: [userResolver, categoryResolver, productResolver],
+    typeDefs: [
+        userTypeSchema, categoryTypeSchema, productTypeSchema, tableTypes
+    ],
+    resolvers: [
+        userResolver, categoryResolver, productResolver, tableResolver
+    ],
 };
 
 module.exports = schema;

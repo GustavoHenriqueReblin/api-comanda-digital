@@ -1,6 +1,6 @@
 import { fakeProductData } from '../../model/productModel';
 
-const userResolver = {
+const productResolver = {
   Query: {
     products: (_: any, { filter }: any) => {
       if (filter && filter.idCategory && filter.idCategory.length > 0) {
@@ -12,4 +12,4 @@ const userResolver = {
   },
 };
   
-module.exports = userResolver;
+module.exports = productResolver;

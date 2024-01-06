@@ -17,3 +17,9 @@ export type Product = {
     price: number,
     description: string
 };
+
+export type Table = {
+    id: number,
+    code: number,
+    state: boolean,
+};

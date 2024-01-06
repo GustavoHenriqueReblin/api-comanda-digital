@@ -1,6 +1,6 @@
 import { fakeCategoryData } from '../../model/categoryModel';
 
-const userResolver = {
+const categoryResolver = {
     Query: {
         categories: () => {
             return fakeCategoryData;
@@ -8,4 +8,4 @@ const userResolver = {
     }
 };
   
-module.exports = userResolver;
+module.exports = categoryResolver;
