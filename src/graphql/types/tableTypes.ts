@@ -1,6 +1,6 @@
-const { gql: tableGql } = require('apollo-server');
+import gql from 'graphql-tag';
 
-const tableType = tableGql`
+const tableType = gql`
     type Table {
         id: ID!
         code: Int!

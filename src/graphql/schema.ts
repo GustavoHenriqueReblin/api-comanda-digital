@@ -1,4 +1,4 @@
-const { gql: schemaGql, makeExecutableSchema } = require('apollo-server');
+import gql from 'graphql-tag';
 const userResolver = require('./resolvers/userResolver');
 const userTypeSchema = require('./types/userType');
 const categoryResolver = require('./resolvers/categoryResolver');
@@ -10,7 +10,7 @@ const tableTypeSchema = require('./types/tableTypes');
 const bartenderResolver = require('./resolvers/bartenderResolver');
 const bartenderTypeSchema = require('./types/bartenderType');
 
-const rootSchema = schemaGql`
+const rootSchema = gql`
     type Query {
         dummy: Boolean
     }

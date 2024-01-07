@@ -1,6 +1,6 @@
-const { gql: categoryGql } = require('apollo-server');
+import gql from 'graphql-tag';
 
-const categoryType = categoryGql`
+const categoryType = gql`
     type Category {
         id: ID!
         name: String!

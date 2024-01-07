@@ -1,6 +1,6 @@
-const { gql: productGql } = require('apollo-server');
+import gql from 'graphql-tag';
 
-const productType = productGql`
+const productType = gql`
     type Product {
         id: ID!
         idCategory: ID!

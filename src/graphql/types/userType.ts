@@ -1,6 +1,6 @@
-const { gql: userGql } = require('apollo-server');
+import gql from 'graphql-tag';
 
-const userType = userGql`
+const userType = gql`
     type User {
         id: ID!
         username: String!

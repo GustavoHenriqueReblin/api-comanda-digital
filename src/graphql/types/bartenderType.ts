@@ -1,6 +1,6 @@
-const { gql: bartenderGql } = require('apollo-server');
+import gql from 'graphql-tag';
 
-const bartenderType = bartenderGql`
+const bartenderType = gql`
     type Bartender {
         id: ID!
         name: String!
@@ -22,6 +22,10 @@ const bartenderType = bartenderGql`
         bartenders: [Bartender!],
         bartender(input: BartenderInput!): Bartender,
         bartenderAuthToken(input: BartenderAuthInput): String
+    }
+
+    type Subscription {
+        messageAdded: String
     }
 `;
 
