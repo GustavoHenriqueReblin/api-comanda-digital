@@ -5,19 +5,23 @@ const bartenderType = bartenderGql`
         id: ID!
         name: String!
         securityCode: String!
+        token: String!
     }
 
     input BartenderInput {
         securityCode: String!
     }
 
-    type Query {
-        bartenders: [Bartender!],
-        bartender(input: BartenderInput!): Bartender
+    input BartenderAuthInput {
+        id: ID!
+        loginAuthorization: Boolean!
+        token: String!
     }
 
-    type Subscription {
-        bartenderSendedAuthRequest: Bartender
+    type Query {
+        bartenders: [Bartender!],
+        bartender(input: BartenderInput!): Bartender,
+        bartenderAuthToken(input: BartenderAuthInput): String
     }
 `;
 

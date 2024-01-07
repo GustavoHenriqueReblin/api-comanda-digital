@@ -26,6 +26,7 @@ export type Table = {
 
 export type Bartender = {
     id: number,
-    name: String,
-    securityCode: String,
+    name: string,
+    securityCode: string,
+    token: string,
 };

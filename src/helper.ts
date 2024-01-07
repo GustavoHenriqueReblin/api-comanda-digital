@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-import { User } from './types';
+import { Bartender, User } from './types';
 require('dotenv').config();
 
 export const VerifyUserToken = (user?: User) => {
@@ -32,4 +32,39 @@ export const VerifyUserToken = (user?: User) => {
     
     // Retorna apenas o usuário vazio (não encontrado) ou já autenticado
     return user;
-}
+};
+
+export const VerifyBartenderToken = (loginAuthorization: boolean, token: string, bartender?: Bartender) => {
+    let result = "";
+
+    if (bartender && loginAuthorization) {
+        if (token !== "") { 
+            // Verifica o token
+            try {
+                jwt.verify(bartender.token, process.env.SECRET_KEY);
+                result = bartender.token;
+            } catch (error: any) {
+                if (error.message = "jwt expired") {
+                    bartender.token = "";
+                }
+            }
+        } else {
+            // Cria um novo token e o retorna
+            const payload = {
+                id: bartender.id,
+                loginAuthorization: !loginAuthorization,
+            };
+
+            const options = {
+                expiresIn: '1d', 
+                algorithm: 'HS256', 
+            };
+            
+            bartender.token = jwt.sign(payload, process.env.SECRET_KEY, options);
+            result = bartender.token
+        }
+    }
+    
+    // Retorna apenas uma string vazia (não encontrado) ou token já autenticado
+    return result;
+};

@@ -1,7 +1,5 @@
-import { PubSub } from 'graphql-subscriptions';
+import { VerifyBartenderToken } from '../../helper';
 import { fakeBartenderData } from '../../model/bartenderModel';
-
-const pubsub = new PubSub();
 
 const bartenderResolver = {
     Query: {
@@ -11,20 +9,18 @@ const bartenderResolver = {
         bartender: (_: any, { input }: any) => {
             const { securityCode } = input;
             const bartender = fakeBartenderData.find(bartender => bartender.securityCode === securityCode);
-            if (bartender) {
-                pubsub.publish('BARTENDER_AUTH_REQUEST', {
-                    bartenderSendedAuthRequest: bartender
-                });
-            }
             return bartender;
         },
-    },
-
-    Subscription: {
-        bartenderSendedAuthRequest: {
-            subscribe: () => pubsub.asyncIterator(['BARTENDER_AUTH_REQUEST']),
+        bartenderAuthToken: (_: any, { input }: any) => {
+            const { id, loginAuthorization, token } = input;
+            const bartender = fakeBartenderData.find(bartender => bartender.id === Number(id));
+            
+            if (bartender) {                
+                return VerifyBartenderToken(loginAuthorization, token, bartender);
+            }
+            return "";
         },
     }
-  };
+};
   
-  module.exports = bartenderResolver;
+module.exports = bartenderResolver;
