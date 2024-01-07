@@ -23,3 +23,9 @@ export type Table = {
     code: number,
     state: boolean,
 };
+
+export type Bartender = {
+    id: number,
+    name: String,
+    securityCode: String,
+};
