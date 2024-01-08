@@ -6,6 +6,12 @@ const bartenderType = gql`
         name: String!
         securityCode: String!
         token: String!
+        isWaiting: Boolean!
+    }
+
+    type BartenderResponse {
+        data: Bartender
+        message: String
     }
 
     input BartenderInput {
@@ -14,11 +20,12 @@ const bartenderType = gql`
 
     type Query {
         bartenders: [Bartender!],
-        bartender(input: BartenderInput!): Bartender
+        bartender(input: BartenderInput!): BartenderResponse!,
+        bartendersIsWaiting: [BartenderResponse]
     }
 
     type Subscription {
-        messageAdded: String
+        authBartenderRequest: Bartender
     }
 `;
 

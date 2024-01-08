@@ -29,4 +29,5 @@ export type Bartender = {
     name: string,
     securityCode: string,
     token: string,
+    isWaiting: boolean,
 };

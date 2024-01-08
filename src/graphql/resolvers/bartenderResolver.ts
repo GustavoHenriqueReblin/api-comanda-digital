@@ -9,19 +9,39 @@ const bartenderResolver = {
         bartender: (_: any, { input }: any) => {
             const { securityCode } = input;
             const bartender = fakeBartenderData.find(bartender => bartender.securityCode === securityCode);
-            if (bartender) {
-                pubsub.publish('MESSAGE_ADDED', { messageAdded: 'Nova mensagem!' });
-                console.log('Publicou MESSAGE_ADDED');
+            
+            let msg;
+            if (bartender && bartender.isWaiting) {
+                msg = "Já existe uma solicitação em aberto, por favor aguarde...";
             }
-            return bartender;
+
+            if (!bartender) {
+                msg = "Nenhum garçom encontrado com esse código!";
+            }
+            
+            if (bartender && !bartender.isWaiting) { // Registra pedido de autorização apenas se já não foi solicitada anteriormente
+                bartender.isWaiting = true;
+                pubsub.publish('BARTENDER_AUTH', { authBartenderRequest: bartender });
+            }
+
+            return {
+                data: bartender,
+                message: msg
+            };
+        },
+        bartendersIsWaiting: () => {
+            const bartendersWaiting = fakeBartenderData.filter(bartender => bartender.isWaiting);
+            return bartendersWaiting.map(bartender => ({
+                data: bartender,
+                message: ""
+            }));
         },
     },
 
     Subscription: {
-        messageAdded: {
+        authBartenderRequest: {
             subscribe: () => {
-                console.log('Subscreveu a MESSAGE_ADDED');
-                return pubsub.asyncIterator(['MESSAGE_ADDED']);
+                return pubsub.asyncIterator(['BARTENDER_AUTH']);
             },
         },
     },
