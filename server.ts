@@ -18,7 +18,7 @@ const schemaGraphQL = require('./src/graphql/schema');
     const schema = makeExecutableSchema({typeDefs, resolvers});
     const wsServer = new WebSocketServer({
         server: httpServer,
-        path: "/"
+        path: "/graphql"
     });
 
     const serverCleanup = useServer({ schema }, wsServer);
@@ -39,9 +39,8 @@ const schemaGraphQL = require('./src/graphql/schema');
     });
 
     await server.start();
-    app.use('/', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server));
+    app.use('/graphql', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server));
     httpServer.listen(4000, () => {
-        console.log("Server running on http://localhost:" + "4000" + "/");
+        console.log("Server running on http://localhost:" + "4000" + "/graphql");
     });
-
 })();
