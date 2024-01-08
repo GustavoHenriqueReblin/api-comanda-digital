@@ -18,11 +18,6 @@ const bartenderResolver = {
             if (!bartender) {
                 msg = "Nenhum garçom encontrado com esse código!";
             }
-            
-            if (bartender && !bartender.isWaiting) { // Registra pedido de autorização apenas se já não foi solicitada anteriormente
-                bartender.isWaiting = true;
-                pubsub.publish('BARTENDER_AUTH', { authBartenderRequest: bartender });
-            }
 
             return {
                 data: bartender,
@@ -38,10 +33,40 @@ const bartenderResolver = {
         },
     },
 
+    Mutation: {
+        updateBartender: (_: any, { input }: any) => {
+          const { id, isWaiting, token } = input;
+          const bartenderIndex = fakeBartenderData.findIndex(b => b.id === Number(id));
+    
+          if (bartenderIndex === -1) {
+            return {
+              data: null,
+              message: 'Garçom não encontrado.',
+            };
+          }
+          const sendAuth = isWaiting !== fakeBartenderData[bartenderIndex].isWaiting;
+    
+          fakeBartenderData[bartenderIndex] = {
+            ...fakeBartenderData[bartenderIndex],
+            isWaiting: isWaiting || fakeBartenderData[bartenderIndex].isWaiting,
+            token: token || fakeBartenderData[bartenderIndex].token,
+          };
+
+          if (sendAuth) {
+            pubsub.publish('BARTENDER_AUTH_REQUEST', { authBartenderRequest: fakeBartenderData[bartenderIndex] });
+          }
+    
+          return {
+            data: fakeBartenderData[bartenderIndex],
+            message: 'Garçom atualizado com sucesso.',
+          };
+        },
+    },
+
     Subscription: {
         authBartenderRequest: {
             subscribe: () => {
-                return pubsub.asyncIterator(['BARTENDER_AUTH']);
+                return pubsub.asyncIterator(['BARTENDER_AUTH_REQUEST']);
             },
         },
     },

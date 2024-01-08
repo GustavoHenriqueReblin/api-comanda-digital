@@ -18,10 +18,20 @@ const bartenderType = gql`
         securityCode: String!
     }
 
+    input UpdateBartenderInput {
+        id: ID!
+        token: String!
+        isWaiting: Boolean!
+    }
+
     type Query {
         bartenders: [Bartender!],
         bartender(input: BartenderInput!): BartenderResponse!,
         bartendersIsWaiting: [BartenderResponse]
+    }
+
+    type Mutation {
+        updateBartender(input: UpdateBartenderInput!): BartenderResponse
     }
 
     type Subscription {
