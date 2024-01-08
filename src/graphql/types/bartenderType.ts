@@ -7,6 +7,7 @@ const bartenderType = gql`
         securityCode: String!
         token: String!
         isWaiting: Boolean!
+        isApproved: Boolean!
     }
 
     type BartenderResponse {
@@ -20,8 +21,9 @@ const bartenderType = gql`
 
     input UpdateBartenderInput {
         id: ID!
-        token: String!
         isWaiting: Boolean!
+        isApproved: Boolean!
+        token: String!
     }
 
     type Query {
@@ -36,6 +38,7 @@ const bartenderType = gql`
 
     type Subscription {
         authBartenderRequest: Bartender
+        authBartenderResponse: Bartender
     }
 `;
 

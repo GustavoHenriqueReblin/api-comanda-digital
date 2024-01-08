@@ -35,7 +35,7 @@ const bartenderResolver = {
 
     Mutation: {
         updateBartender: (_: any, { input }: any) => {
-          const { id, isWaiting, token } = input;
+          const { id, isWaiting, isApproved, token } = input;
           const bartenderIndex = fakeBartenderData.findIndex(b => b.id === Number(id));
     
           if (bartenderIndex === -1) {
@@ -44,16 +44,23 @@ const bartenderResolver = {
               message: 'Garçom não encontrado.',
             };
           }
-          const sendAuth = isWaiting !== fakeBartenderData[bartenderIndex].isWaiting;
-    
+
+          const sendAuth = isWaiting !== fakeBartenderData[bartenderIndex].isWaiting && isWaiting;
+          const sendAuthResponse = isApproved !== fakeBartenderData[bartenderIndex].isApproved;
+
           fakeBartenderData[bartenderIndex] = {
             ...fakeBartenderData[bartenderIndex],
-            isWaiting: isWaiting || fakeBartenderData[bartenderIndex].isWaiting,
-            token: token || fakeBartenderData[bartenderIndex].token,
+            isWaiting: isWaiting,
+            isApproved: isApproved,
+            token: token,
           };
 
           if (sendAuth) {
             pubsub.publish('BARTENDER_AUTH_REQUEST', { authBartenderRequest: fakeBartenderData[bartenderIndex] });
+          }
+
+          if (sendAuthResponse) {
+            pubsub.publish('BARTENDER_AUTH_RESPONSE', { authBartenderResponse: fakeBartenderData[bartenderIndex] });
           }
     
           return {
@@ -67,6 +74,11 @@ const bartenderResolver = {
         authBartenderRequest: {
             subscribe: () => {
                 return pubsub.asyncIterator(['BARTENDER_AUTH_REQUEST']);
+            },
+        },
+        authBartenderResponse: {
+            subscribe: () => {
+                return pubsub.asyncIterator(['BARTENDER_AUTH_RESPONSE']);
             },
         },
     },
