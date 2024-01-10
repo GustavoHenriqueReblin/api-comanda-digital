@@ -1,5 +1,6 @@
 import pubsub from '../pubsub';
 import { fakeBartenderData } from '../../model/bartenderModel';
+import { verifyBartenderToken } from '../../helper';
 
 const bartenderResolver = {
     Query: {
@@ -35,38 +36,40 @@ const bartenderResolver = {
 
     Mutation: {
         updateBartender: (_: any, { input }: any) => {
-          const { id, isWaiting, isApproved, token } = input;
-          const bartenderIndex = fakeBartenderData.findIndex(b => b.id === Number(id));
-    
-          if (bartenderIndex === -1) {
-            return {
-              data: null,
-              message: 'Garçom não encontrado.',
+            const { id, isWaiting, isApproved, token } = input;
+            const bartenderIndex = fakeBartenderData.findIndex(b => b.id === Number(id));
+        
+            if (bartenderIndex === -1) {
+                return {
+                data: null,
+                message: 'Garçom não encontrado.',
+                };
+            }
+
+            const sendAuth = isWaiting !== fakeBartenderData[bartenderIndex].isWaiting && isWaiting;
+
+            const sendAuthResponse = isApproved !== undefined;
+            const isApprovedNewValue = sendAuthResponse ? isApproved : fakeBartenderData[bartenderIndex].isApproved;
+
+            fakeBartenderData[bartenderIndex] = {
+                ...fakeBartenderData[bartenderIndex],
+                isWaiting: isWaiting,
+                isApproved: isApprovedNewValue,
+                token: sendAuthResponse && isApprovedNewValue ? verifyBartenderToken(token, id) : token,
             };
-          }
-
-          const sendAuth = isWaiting !== fakeBartenderData[bartenderIndex].isWaiting && isWaiting;
-          const sendAuthResponse = isApproved !== fakeBartenderData[bartenderIndex].isApproved;
-
-          fakeBartenderData[bartenderIndex] = {
-            ...fakeBartenderData[bartenderIndex],
-            isWaiting: isWaiting,
-            isApproved: isApproved,
-            token: token,
-          };
-
-          if (sendAuth) {
-            pubsub.publish('BARTENDER_AUTH_REQUEST', { authBartenderRequest: fakeBartenderData[bartenderIndex] });
-          }
-
-          if (sendAuthResponse) {
-            pubsub.publish('BARTENDER_AUTH_RESPONSE', { authBartenderResponse: fakeBartenderData[bartenderIndex] });
-          }
-    
-          return {
-            data: fakeBartenderData[bartenderIndex],
-            message: 'Garçom atualizado com sucesso.',
-          };
+            
+            if (sendAuth) {
+                pubsub.publish('BARTENDER_AUTH_REQUEST', { authBartenderRequest: fakeBartenderData[bartenderIndex] });
+            }
+            
+            if (sendAuthResponse) {
+                pubsub.publish('BARTENDER_AUTH_RESPONSE', { authBartenderResponse: fakeBartenderData[bartenderIndex] });
+            }
+        
+            return {
+                data: fakeBartenderData[bartenderIndex],
+                message: 'Garçom atualizado com sucesso.',
+            };
         },
     },
 

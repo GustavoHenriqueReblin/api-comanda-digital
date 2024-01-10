@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 import { Bartender, User } from './types';
 require('dotenv').config();
 
-export const VerifyUserToken = (user?: User) => {
+export const verifyUserToken = (user?: User) => {
     if (user) {
         if (user.token) { 
             // Verifica o token
@@ -34,35 +34,31 @@ export const VerifyUserToken = (user?: User) => {
     return user;
 };
 
-export const VerifyBartenderToken = (loginAuthorization: boolean, token: string, bartender?: Bartender) => {
+export const verifyBartenderToken = (token: string, id: string) => {
     let result = "";
 
-    if (bartender && loginAuthorization) {
-        if (token !== "") { 
-            // Verifica o token
-            try {
-                jwt.verify(bartender.token, process.env.SECRET_KEY);
-                result = bartender.token;
-            } catch (error: any) {
-                if (error.message = "jwt expired") {
-                    bartender.token = "";
-                }
+    if (token && token !== "") {
+        // Verifica o token
+        try {
+            jwt.verify(token, process.env.SECRET_KEY);
+            result = token;
+        } catch (error: any) {
+            if (error.message = "jwt expired") {
+                token = "";
             }
-        } else {
-            // Cria um novo token e o retorna
-            const payload = {
-                id: bartender.id,
-                loginAuthorization: !loginAuthorization,
-            };
-
-            const options = {
-                expiresIn: '1d', 
-                algorithm: 'HS256', 
-            };
-            
-            bartender.token = jwt.sign(payload, process.env.SECRET_KEY, options);
-            result = bartender.token
         }
+    } else {
+        // Cria um novo token e o retorna
+        const payload = {
+            id: id,
+        };
+
+        const options = {
+            expiresIn: '1d', 
+            algorithm: 'HS256', 
+        };
+        
+        result = jwt.sign(payload, process.env.SECRET_KEY, options);
     }
     
     // Retorna apenas uma string vazia (não encontrado) ou token já autenticado

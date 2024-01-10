@@ -41,7 +41,7 @@ require('dotenv').config();
 
     await server.start();
     app.use('/graphql', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server));
-    httpServer.listen(process.env.PORT, () => {
-        console.log("Server running on http://localhost:" + process.env.PORT + "/graphql");
+    httpServer.listen(process.env.PORT, Number(process.env.IP), () => {
+        console.log(`Server running on http://${process.env.IP}:${process.env.PORT}/graphql`);
     });
 })();
