@@ -10,9 +10,20 @@ const bartenderResolver = {
         bartender: (_: any, { input }: any) => {
             const { securityCode } = input;
             const dataWithoutIsApproved = fakeBartenderData.map(({ isApproved, ...rest }) => rest);
-            const bartender = dataWithoutIsApproved.find(bartender => bartender.securityCode === securityCode);
-
+            let bartender = dataWithoutIsApproved.find(bartender => bartender.securityCode === securityCode);
             let msg;
+
+            if (bartender && bartender.token) {
+                bartender = {
+                    id: -1,
+                    name: "",
+                    securityCode: "",
+                    token: "",
+                    isWaiting: false
+                }
+                msg = "Este garçom já está logado em outro dispositivo...";
+            }
+
             if (bartender && bartender.isWaiting) {
                 msg = "Já existe uma solicitação em aberto, por favor aguarde...";
             }
@@ -25,6 +36,13 @@ const bartenderResolver = {
                 data: bartender,
                 message: msg
             };
+        },
+        bartendersAreWaiting: () => {
+            const bartendersWaiting = fakeBartenderData.filter(bartender => bartender.isWaiting);
+            return bartendersWaiting.map(bartender => ({
+                data: bartender,
+                message: ""
+            }));
         },
     },
 
@@ -47,7 +65,6 @@ const bartenderResolver = {
             const bartendersAreWaiting = fakeBartenderData.filter((bartender: any) => bartender.isWaiting);
 
             if (bartendersAreWaiting.length > 0) {
-                console.log("Requestou");
                 pubsub.publish('BARTENDER_AUTH_REQUEST', { authBartenderRequest: bartendersAreWaiting });
             }
             
