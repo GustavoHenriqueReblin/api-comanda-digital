@@ -29,7 +29,6 @@ const bartenderType = gql`
     type Query {
         bartenders: [Bartender!],
         bartender(input: BartenderInput!): BartenderResponse!,
-        bartendersIsWaiting: [BartenderResponse]
     }
 
     type Mutation {
@@ -37,7 +36,7 @@ const bartenderType = gql`
     }
 
     type Subscription {
-        authBartenderRequest: Bartender
+        authBartenderRequest: [Bartender]
         authBartenderResponse: Bartender
     }
 `;

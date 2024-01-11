@@ -9,8 +9,9 @@ const bartenderResolver = {
         },
         bartender: (_: any, { input }: any) => {
             const { securityCode } = input;
-            const bartender = fakeBartenderData.find(bartender => bartender.securityCode === securityCode);
-            
+            const dataWithoutIsApproved = fakeBartenderData.map(({ isApproved, ...rest }) => rest);
+            const bartender = dataWithoutIsApproved.find(bartender => bartender.securityCode === securityCode);
+
             let msg;
             if (bartender && bartender.isWaiting) {
                 msg = "Já existe uma solicitação em aberto, por favor aguarde...";
@@ -25,49 +26,37 @@ const bartenderResolver = {
                 message: msg
             };
         },
-        bartendersIsWaiting: () => {
-            const bartendersWaiting = fakeBartenderData.filter(bartender => bartender.isWaiting);
-            return bartendersWaiting.map(bartender => ({
-                data: bartender,
-                message: ""
-            }));
-        },
     },
 
     Mutation: {
         updateBartender: (_: any, { input }: any) => {
             const { id, isWaiting, isApproved, token } = input;
-            const bartenderIndex = fakeBartenderData.findIndex(b => b.id === Number(id));
-        
-            if (bartenderIndex === -1) {
-                return {
-                data: null,
-                message: 'Garçom não encontrado.',
-                };
-            }
-
-            const sendAuth = isWaiting !== fakeBartenderData[bartenderIndex].isWaiting && isWaiting;
-
+            const Index = fakeBartenderData.findIndex(bartender => bartender.id === Number(id));
             const sendAuthResponse = isApproved !== undefined;
-            const isApprovedNewValue = sendAuthResponse ? isApproved : fakeBartenderData[bartenderIndex].isApproved;
+            const isApprovedNewValue = sendAuthResponse ? isApproved : fakeBartenderData[Index].isApproved;
 
-            fakeBartenderData[bartenderIndex] = {
-                ...fakeBartenderData[bartenderIndex],
+            // Atualiza os dados com o que foi passado na mutation
+            fakeBartenderData[Index] = {
+                ...fakeBartenderData[Index],
                 isWaiting: isWaiting,
                 isApproved: isApprovedNewValue,
                 token: sendAuthResponse && isApprovedNewValue ? verifyBartenderToken(token, id) : token,
             };
-            
-            if (sendAuth) {
-                pubsub.publish('BARTENDER_AUTH_REQUEST', { authBartenderRequest: fakeBartenderData[bartenderIndex] });
+
+            // Busca todos os garçons que estão aguardando aprovação para subscription retornar
+            const bartendersAreWaiting = fakeBartenderData.filter((bartender: any) => bartender.isWaiting);
+
+            if (bartendersAreWaiting.length > 0) {
+                console.log("Requestou");
+                pubsub.publish('BARTENDER_AUTH_REQUEST', { authBartenderRequest: bartendersAreWaiting });
             }
             
             if (sendAuthResponse) {
-                pubsub.publish('BARTENDER_AUTH_RESPONSE', { authBartenderResponse: fakeBartenderData[bartenderIndex] });
+                pubsub.publish('BARTENDER_AUTH_RESPONSE', { authBartenderResponse: fakeBartenderData[Index] });
             }
         
             return {
-                data: fakeBartenderData[bartenderIndex],
+                data: fakeBartenderData[Index],
                 message: 'Garçom atualizado com sucesso.',
             };
         },
