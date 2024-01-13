@@ -16,6 +16,7 @@ const bartenderType = gql`
     }
 
     input BartenderInput {
+        token: String
         securityCode: String!
     }
 
@@ -30,6 +31,7 @@ const bartenderType = gql`
         bartenders: [Bartender!],
         bartender(input: BartenderInput!): BartenderResponse!,
         bartendersAreWaiting: [BartenderResponse],
+        getDataByToken(input: BartenderInput!): BartenderResponse
     }
 
     type Mutation {

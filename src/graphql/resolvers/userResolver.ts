@@ -1,5 +1,6 @@
 import { fakeUserData } from '../../model/userModel';
 import { verifyUserToken } from '../../helper';
+const jwt = require('jsonwebtoken');
 
 const userResolver = {
     Query: {
@@ -10,6 +11,15 @@ const userResolver = {
             const { username, password } = input;
             const user = fakeUserData.find(user => user.username === username && user.password === password);
             return verifyUserToken(user);
+        },
+        getIdByToken: (_: any, { input }: any) => {
+            const { token } = input;
+            const user = fakeUserData.find(user => user.token === token);
+            if (user) {
+                const decoded = jwt.verify(user.token, process.env.SECRET_KEY);
+                return decoded.id;
+            }
+            return -1;
         },
     },
 

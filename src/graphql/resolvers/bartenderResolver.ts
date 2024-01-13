@@ -1,6 +1,7 @@
 import pubsub from '../pubsub';
 import { fakeBartenderData } from '../../model/bartenderModel';
 import { verifyBartenderToken } from '../../helper';
+const jwt = require('jsonwebtoken');
 
 const bartenderResolver = {
     Query: {
@@ -43,6 +44,37 @@ const bartenderResolver = {
                 data: bartender,
                 message: ""
             }));
+        },
+        getDataByToken: (_: any, { input }: any) => {
+            const { token } = input;
+            try {
+                const decoded = jwt.verify(token, process.env.SECRET_KEY);
+
+                const bartender = {
+                    id: decoded.id,
+                    name: decoded.name,
+                    securityCode: decoded.securityCode,
+                    token: "",
+                    isWaiting: decoded.isWaiting,
+                    isApproved: decoded.isApproved,
+                }
+
+                return {
+                    data: bartender,
+                    message: ""
+                };
+            } catch {
+                return {
+                    data: {
+                        id: -1,
+                        name: "",
+                        securityCode: "",
+                        token: "",
+                        isWaiting: false
+                    },
+                    message: ""
+                };
+            }
         },
     },
 

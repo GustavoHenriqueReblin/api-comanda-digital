@@ -17,7 +17,8 @@ const userType = gql`
 
     type Query {
         users: [User!],
-        user(input: UserInput!): User
+        user(input: UserInput!): User,
+        getIdByToken(input: UserInput!): ID
     }
 
     type Mutation {

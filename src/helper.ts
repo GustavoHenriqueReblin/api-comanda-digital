@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-import { Bartender, User } from './types';
+import { fakeBartenderData } from './model/bartenderModel';
+import { User } from './types';
 require('dotenv').config();
 
 export const verifyUserToken = (user?: User, sendNewToken: boolean = true) => {
@@ -38,6 +39,7 @@ export const verifyUserToken = (user?: User, sendNewToken: boolean = true) => {
 
 export const verifyBartenderToken = (token: string, id: string) => {
     let result = "";
+    const bartender = fakeBartenderData.find(bartender => bartender.id === Number(id));
 
     if (token && token !== "") {
         // Verifica o token
@@ -53,6 +55,10 @@ export const verifyBartenderToken = (token: string, id: string) => {
         // Cria um novo token e o retorna
         const payload = {
             id: id,
+            name: bartender?.name,
+            securityCode: bartender?.securityCode,
+            isWaiting: bartender?.isWaiting,
+            isApproved: bartender?.isApproved,
         };
 
         const options = {
