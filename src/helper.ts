@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 import { Bartender, User } from './types';
 require('dotenv').config();
 
-export const verifyUserToken = (user?: User) => {
+export const verifyUserToken = (user?: User, sendNewToken: boolean = true) => {
     if (user) {
         if (user.token) { 
             // Verifica o token
@@ -26,7 +26,9 @@ export const verifyUserToken = (user?: User) => {
                 algorithm: 'HS256', 
             };
 
-            user.token = jwt.sign(payload, process.env.SECRET_KEY, options);
+            if (sendNewToken) {
+                user.token = jwt.sign(payload, process.env.SECRET_KEY, options);
+            }
         }
     }
     

@@ -9,8 +9,10 @@ const userType = gql`
     }
 
     input UserInput {
-        username: String!
-        password: String!
+        id: ID
+        username: String
+        password: String
+        token: String
     }
 
     type Query {
@@ -20,6 +22,7 @@ const userType = gql`
 
     type Mutation {
         createUser(input: UserInput!): User!
+        updateUser(input: UserInput!): User!
     }
 `;
 

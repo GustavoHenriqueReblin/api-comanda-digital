@@ -24,7 +24,14 @@ const userResolver = {
             };
             fakeUserData.push(newUser);
             return newUser;
-        }
+        }, 
+
+        updateUser: (_: any, args: any, __: any) => {
+            const { id } = args.input;
+            const Index = fakeUserData.findIndex(user => user.id === Number(id));
+
+            return verifyUserToken(fakeUserData[Index], false);
+        },
     }
   };
   
