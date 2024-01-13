@@ -48,7 +48,9 @@ const bartenderResolver = {
         getDataByToken: (_: any, { input }: any) => {
             const { token } = input;
             try {
-                const decoded = jwt.verify(token, process.env.SECRET_KEY);
+                let tokenTreaty = token;
+                tokenTreaty = token.charAt(0) === '"' && token.match(/"([^"]*)"/)[1];
+                const decoded = jwt.verify(tokenTreaty, process.env.SECRET_KEY);
 
                 const bartender = {
                     id: decoded.id,
@@ -57,13 +59,14 @@ const bartenderResolver = {
                     token: "",
                     isWaiting: decoded.isWaiting,
                     isApproved: decoded.isApproved,
-                }
+                };
 
                 return {
                     data: bartender,
                     message: ""
                 };
-            } catch {
+            } catch (error) {
+                console.log("Erro ao buscar dados pelo token informado: " + error);
                 return {
                     data: {
                         id: -1,
