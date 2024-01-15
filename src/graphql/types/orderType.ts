@@ -3,6 +3,14 @@ import gql from 'graphql-tag';
 const orderType = gql`
     scalar Date
 
+    type OrderItems {
+        id: ID!
+        orderId: ID!
+        productId: ID!
+        value: Float!
+        status: Int! #  0: Cancelado, 1: Confirmado
+    }
+
     type Order {
         id: ID!
         bartenderId: ID!
@@ -10,14 +18,15 @@ const orderType = gql`
         value: Float!
         date: Date!
         status: Int! #  0: Concluído, 1: Resgatado, 2: Confirmado, 3: Finalizado
+        items: [OrderItems]!
     }
 
-    type OrderItems {
+    input OrderItemsInput {
         id: ID!
         orderId: ID!
         productId: ID!
         value: Float!
-        status: Int! #  0: Cancelado, 1: Confirmado
+        status: Int!
     }
 
     input OrderInput {
@@ -30,17 +39,8 @@ const orderType = gql`
         items: [OrderItemsInput!]!
     }
 
-    input OrderItemsInput {
-        id: ID!
-        orderId: ID!
-        productId: ID!
-        value: Float!
-        status: Int!
-    }
-
     type OrderResponse {
         data: Order!
-        items: [OrderItems]!
         message: String
     }
 
@@ -52,6 +52,10 @@ const orderType = gql`
     type Mutation {
         createOrder(input: OrderInput!): OrderResponse
         updateOrder(input: OrderInput!): OrderResponse
+    }
+
+    type Subscription {
+        changeOrderStatus: [OrderResponse]
     }
 `;
 

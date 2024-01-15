@@ -1,14 +1,12 @@
 import { fakeOrderData } from '../../model/orderModel';
 import { fakeOrderItemsData } from '../../model/orderItemsModel';
 import { nextId } from '../../helper';
+import pubsub from '../pubsub';
 
 const orderResolver = {
     Query: {
         orders: () => {
             return fakeOrderData;
-        },
-        ordersItems: () => {
-            return fakeOrderItemsData;
         },
     },
 
@@ -38,13 +36,13 @@ const orderResolver = {
                 tableId,
                 value: sumItemsValue,
                 date,
-                status
+                status,
+                items: newOrderItems
             };
             fakeOrderData.push(newOrder);
             
             return {
                 data: newOrder,
-                items: newOrderItems,
                 message: 'Pedido criado com sucesso!',
             };
         },
@@ -53,49 +51,52 @@ const orderResolver = {
             const items = input.items;
 
             // Pedido
-            const Index = fakeOrderData.findIndex(order => order.id === Number(id));
-            fakeOrderData[Index] = {
-                ...fakeOrderData[Index],
+            const index = fakeOrderData.findIndex(order => order.id === Number(id));
+            fakeOrderData[index] = {
+                ...fakeOrderData[index],
                 id,
                 bartenderId,
                 tableId,
                 value,
                 date,
-                status
+                status,
+                items: items.map((item: any) => {
+                    const itemIndex = fakeOrderItemsData.findIndex(existingItem => existingItem.id === Number(item.id));
+
+                    if (itemIndex !== -1) { // Atualiza o item existente
+                        fakeOrderItemsData[itemIndex] = {
+                            ...fakeOrderItemsData[itemIndex],
+                            productId: item.productId,
+                            value: item.value,
+                            status: item.status
+                        };
+                        return fakeOrderItemsData[itemIndex];
+                    } else { // Adiciona o novo item
+                        const newItem = {
+                            id: nextId(fakeOrderItemsData),
+                            orderId: Number(id),
+                            productId: item.productId,
+                            value: item.value,
+                            status: item.status
+                        };
+                        fakeOrderItemsData.push(newItem);
+                        return newItem;
+                    }
+                })
             };
-
-            // Itens
-            const existingItems = fakeOrderItemsData.filter(item => item.orderId === Number(id));
-            items.forEach((item: any) => {
-                const existingItemIndex = existingItems.findIndex(existingItem => existingItem.id === Number(item.id));
             
-                if (existingItemIndex !== -1) { // Atualiza o item existente
-                    fakeOrderItemsData[existingItemIndex] = {
-                        ...existingItems[existingItemIndex],
-                        productId: item.productId,
-                        value: item.value,
-                        status: item.status
-                    };
-                } else { // Adiciona o novo item
-                    const newItem = {
-                        id: nextId(fakeOrderItemsData),
-                        orderId: Number(id),
-                        productId: item.productId,
-                        value: item.value,
-                        status: item.status
-                    };
-                    fakeOrderItemsData.push(newItem);
-                }
-            });
-
-            const updatedOrder = fakeOrderData[Index];
-            const updatedItems = fakeOrderItemsData.filter(item => item.orderId === Number(id));
-
             return {
-                data: updatedOrder,
-                items: updatedItems,
+                data: fakeOrderData[index],
                 message: 'Pedido atualizado com sucesso!',
             };
+        },
+    },
+
+    Subscription: {
+        changeOrderStatus: {
+            subscribe: () => {
+                return pubsub.asyncIterator(['ORDER_STATUS']);
+            },
         },
     },
 };
