@@ -72,3 +72,9 @@ export const verifyBartenderToken = (token: string, id: string) => {
     // Retorna apenas uma string vazia (não encontrado) ou token já autenticado
     return result;
 };
+
+export const nextId = (data: any) => {
+    return data.reduce((maxId: any, obj: any) => {
+        return Math.max(maxId, obj.id);
+    }, 0) + 1;
+};

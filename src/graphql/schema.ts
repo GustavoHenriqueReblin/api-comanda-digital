@@ -9,6 +9,8 @@ const tableResolver = require('./resolvers/tableResolver');
 const tableTypeSchema = require('./types/tableTypes');
 const bartenderResolver = require('./resolvers/bartenderResolver');
 const bartenderTypeSchema = require('./types/bartenderType');
+const orderResolver = require('./resolvers/orderResolver');
+const orderTypeSchema = require('./types/orderType');
 
 const rootSchema = gql`
     type Query {
@@ -22,10 +24,10 @@ const rootSchema = gql`
 
 const schema = {
     typeDefs: [
-        userTypeSchema, categoryTypeSchema, productTypeSchema, tableTypeSchema, bartenderTypeSchema
+        userTypeSchema, categoryTypeSchema, productTypeSchema, tableTypeSchema, bartenderTypeSchema, orderTypeSchema
     ],
     resolvers: [
-        userResolver, categoryResolver, productResolver, tableResolver, bartenderResolver
+        userResolver, categoryResolver, productResolver, tableResolver, bartenderResolver, orderResolver
     ],
 };
 

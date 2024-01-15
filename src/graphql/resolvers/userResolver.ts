@@ -1,5 +1,5 @@
 import { fakeUserData } from '../../model/userModel';
-import { verifyUserToken } from '../../helper';
+import { nextId, verifyUserToken } from '../../helper';
 const jwt = require('jsonwebtoken');
 
 const userResolver = {
@@ -27,7 +27,7 @@ const userResolver = {
         createUser: (_: any, args: any, __: any) => {
             const { username, password } = args.input;
             const newUser: any = {
-                id: fakeUserData.length + 1,
+                id: nextId(fakeUserData),
                 username: username,
                 password: password,
                 token: ""
