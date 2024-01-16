@@ -19,6 +19,7 @@ const orderResolver = {
             const newOrderId = nextId(fakeOrderData);
             const newOrderItems = items.map((item: any) => {
                 sumItemsValue += item.status === 1 ? item.value : 0;
+
                 const newItem = {
                     id: nextId(fakeOrderItemsData),
                     orderId: newOrderId,
@@ -26,6 +27,7 @@ const orderResolver = {
                     value: item.value,
                     status: item.status 
                 };
+
                 fakeOrderItemsData.push(newItem);
                 return newItem;
             });
@@ -40,6 +42,14 @@ const orderResolver = {
                 items: newOrderItems
             };
             fakeOrderData.push(newOrder);
+
+            const completedOrders = fakeOrderData.filter(order => order.status === 0);
+            pubsub.publish('COMPLETED_ORDERS', {
+                changeOrderStatus: completedOrders.map(order => ({
+                    data: order,
+                    message: 'Pedido concluído...'
+                }))
+            });            
             
             return {
                 data: newOrder,
@@ -50,11 +60,9 @@ const orderResolver = {
             const { id, bartenderId, tableId, value, date, status } = input;
             const items = input.items;
 
-            // Pedido
             const index = fakeOrderData.findIndex(order => order.id === Number(id));
             fakeOrderData[index] = {
                 ...fakeOrderData[index],
-                id,
                 bartenderId,
                 tableId,
                 value,
@@ -63,7 +71,8 @@ const orderResolver = {
                 items: items.map((item: any) => {
                     const itemIndex = fakeOrderItemsData.findIndex(existingItem => existingItem.id === Number(item.id));
 
-                    if (itemIndex !== -1) { // Atualiza o item existente
+                    if (itemIndex !== -1) { 
+                        // Atualiza o item existente
                         fakeOrderItemsData[itemIndex] = {
                             ...fakeOrderItemsData[itemIndex],
                             productId: item.productId,
@@ -71,7 +80,8 @@ const orderResolver = {
                             status: item.status
                         };
                         return fakeOrderItemsData[itemIndex];
-                    } else { // Adiciona o novo item
+                    } else { 
+                        // Adiciona o novo item
                         const newItem = {
                             id: nextId(fakeOrderItemsData),
                             orderId: Number(id),
@@ -84,6 +94,36 @@ const orderResolver = {
                     }
                 })
             };
+
+            const completedOrders = fakeOrderData.filter(order => order.status === 0);
+            if (!!completedOrders) {
+                pubsub.publish('COMPLETED_ORDERS', {
+                    completedOrders: completedOrders.map(order => ({
+                        data: order,
+                        message: 'Pedido concluído...'
+                    }))
+                })
+            };
+
+            const redeemedOrders = fakeOrderData.filter(order => order.status === 1);
+            if (!!redeemedOrders) {
+                pubsub.publish('REDEEMED_ORDERS', {
+                    redeemedOrders: redeemedOrders.map(order => ({
+                        data: order,
+                        message: 'Pedido resgatado...'
+                    }))
+                })
+            };
+
+            const confirmedOrders = fakeOrderData.filter(order => order.status === 2);
+            if (!!confirmedOrders) {
+                pubsub.publish('CONFIRMED_ORDERS', {
+                    confirmedOrders: confirmedOrders.map(order => ({
+                        data: order,
+                        message: 'Pedido finalizado...'
+                    }))
+                })
+            };
             
             return {
                 data: fakeOrderData[index],
@@ -93,9 +133,19 @@ const orderResolver = {
     },
 
     Subscription: {
-        changeOrderStatus: {
+        completedOrders: {
             subscribe: () => {
-                return pubsub.asyncIterator(['ORDER_STATUS']);
+                return pubsub.asyncIterator(['COMPLETED_ORDERS']);
+            },
+        },
+        redeemedOrders: {
+            subscribe: () => {
+                return pubsub.asyncIterator(['REDEEMED_ORDERS']);
+            },
+        },
+        confirmedOrders: {
+            subscribe: () => {
+                return pubsub.asyncIterator(['CONFIRMED_ORDERS']);
             },
         },
     },

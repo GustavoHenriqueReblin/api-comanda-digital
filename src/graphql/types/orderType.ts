@@ -55,7 +55,10 @@ const orderType = gql`
     }
 
     type Subscription {
-        changeOrderStatus: [OrderResponse]
+        completedOrders: [OrderResponse],
+        redeemedOrders: [OrderResponse],
+        confirmedOrders: [OrderResponse],
+        #finishedOrders: [OrderResponse]
     }
 `;
 
