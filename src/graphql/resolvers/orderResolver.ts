@@ -5,8 +5,8 @@ import pubsub from '../pubsub';
 
 const orderResolver = {
     Query: {
-        orders: () => {
-            return fakeOrderData;
+        orders: (_: any, { input }: any) => {
+            return fakeOrderData.filter(order => input.status.includes(order.status));
         },
     },
 
@@ -43,15 +43,13 @@ const orderResolver = {
             };
             fakeOrderData.push(newOrder);
 
-            const completedOrders = fakeOrderData.filter(order => order.status === 0);            
-            if (completedOrders.length > 0) {
-                pubsub.publish('COMPLETED_ORDERS', {
-                    completedOrders: completedOrders.map(order => ({
-                        data: order,
-                        message: 'Pedido concluído...'
-                    }))
-                })
-            };            
+            const completedOrders = fakeOrderData.filter(order => order.status === 0);                
+            pubsub.publish('COMPLETED_ORDERS', {
+                completedOrders: completedOrders.map(order => ({
+                    data: order,
+                    message: 'Pedido concluído...'
+                }))
+            });
             
             return {
                 data: newOrder,
@@ -98,34 +96,28 @@ const orderResolver = {
             };
 
             const completedOrders = fakeOrderData.filter(order => order.status === 0);
-            if (completedOrders.length > 0) {
-                pubsub.publish('COMPLETED_ORDERS', {
-                    completedOrders: completedOrders.map(order => ({
-                        data: order,
-                        message: 'Pedido concluído...'
-                    }))
-                })
-            };
+            pubsub.publish('COMPLETED_ORDERS', {
+                completedOrders: completedOrders.map(order => ({
+                    data: order,
+                    message: 'Pedido concluído...'
+                }))
+            });
 
             const redeemedOrders = fakeOrderData.filter(order => order.status === 1);
-            if (redeemedOrders.length > 0) {
-                pubsub.publish('REDEEMED_ORDERS', {
-                    redeemedOrders: redeemedOrders.map(order => ({
-                        data: order,
-                        message: 'Pedido resgatado...'
-                    }))
-                })
-            };
+            pubsub.publish('REDEEMED_ORDERS', {
+                redeemedOrders: redeemedOrders.map(order => ({
+                    data: order,
+                    message: 'Pedido resgatado...'
+                }))
+            });
 
             const confirmedOrders = fakeOrderData.filter(order => order.status === 2);
-            if (confirmedOrders.length > 0) {
-                pubsub.publish('CONFIRMED_ORDERS', {
-                    confirmedOrders: confirmedOrders.map(order => ({
-                        data: order,
-                        message: 'Pedido finalizado...'
-                    }))
-                })
-            };
+            pubsub.publish('CONFIRMED_ORDERS', {
+                confirmedOrders: confirmedOrders.map(order => ({
+                    data: order,
+                    message: 'Pedido finalizado...'
+                }))
+            });
             
             return {
                 data: fakeOrderData[index],

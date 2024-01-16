@@ -39,13 +39,17 @@ const orderType = gql`
         items: [OrderItemsInput!]!
     }
 
+    input OrderStatusInput {
+        status: [Int!]!
+    }
+
     type OrderResponse {
         data: Order!
         message: String
     }
 
     type Query {
-        orders: [Order!],
+        orders(input: OrderStatusInput): [Order!],
         ordersItems: [OrderItems!],
     }
 
