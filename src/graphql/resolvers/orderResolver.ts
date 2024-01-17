@@ -43,11 +43,12 @@ const orderResolver = {
             };
             fakeOrderData.push(newOrder);
 
-            const completedOrders = fakeOrderData.filter(order => order.status === 0);                
-            pubsub.publish('COMPLETED_ORDERS', {
-                completedOrders: completedOrders.map(order => ({
+            const statusToReturn = [0, 1, 2];
+            const Orders = fakeOrderData.filter(order => statusToReturn.includes(order.status));
+            pubsub.publish('CHANGE_ORDER_STATUS', {
+                ChangeOrderStatus: Orders.map(order => ({
                     data: order,
-                    message: 'Pedido concluído...'
+                    message: ''
                 }))
             });
             
@@ -95,27 +96,12 @@ const orderResolver = {
                 })
             };
 
-            const completedOrders = fakeOrderData.filter(order => order.status === 0);
-            pubsub.publish('COMPLETED_ORDERS', {
-                completedOrders: completedOrders.map(order => ({
+            const statusToReturn = [0, 1, 2];
+            const Orders = fakeOrderData.filter(order => statusToReturn.includes(order.status));
+            pubsub.publish('CHANGE_ORDER_STATUS', {
+                ChangeOrderStatus: Orders.map(order => ({
                     data: order,
-                    message: 'Pedido concluído...'
-                }))
-            });
-
-            const redeemedOrders = fakeOrderData.filter(order => order.status === 1);
-            pubsub.publish('REDEEMED_ORDERS', {
-                redeemedOrders: redeemedOrders.map(order => ({
-                    data: order,
-                    message: 'Pedido resgatado...'
-                }))
-            });
-
-            const confirmedOrders = fakeOrderData.filter(order => order.status === 2);
-            pubsub.publish('CONFIRMED_ORDERS', {
-                confirmedOrders: confirmedOrders.map(order => ({
-                    data: order,
-                    message: 'Pedido finalizado...'
+                    message: ''
                 }))
             });
             
@@ -127,19 +113,9 @@ const orderResolver = {
     },
 
     Subscription: {
-        completedOrders: {
+        ChangeOrderStatus: {
             subscribe: () => {
-                return pubsub.asyncIterator(['COMPLETED_ORDERS']);
-            },
-        },
-        redeemedOrders: {
-            subscribe: () => {
-                return pubsub.asyncIterator(['REDEEMED_ORDERS']);
-            },
-        },
-        confirmedOrders: {
-            subscribe: () => {
-                return pubsub.asyncIterator(['CONFIRMED_ORDERS']);
+                return pubsub.asyncIterator(['CHANGE_ORDER_STATUS']);
             },
         },
     },
