@@ -10,6 +10,25 @@ const tableType = gql`
     type Query {
         tables: [Table!],
     }
+
+    type TableResponse {
+        data: Table!
+        message: String
+    }
+
+    input TableInput {
+        id: ID!
+        code: Int!
+        state: Boolean!
+    }
+
+    type Mutation {
+        updateTable(input: TableInput!): TableResponse
+    }
+
+    type Subscription {
+        ChangeTableStatus: [TableResponse],
+    }
 `;
 
 module.exports = tableType;
