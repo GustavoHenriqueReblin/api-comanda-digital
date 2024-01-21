@@ -10,7 +10,8 @@ const productType = gql`
     }
 
     input FilterInput {
-        idCategory: [Int]
+        categoriesIds: [Int]
+        productsIds: [Int]
     }
 
     type Query {
