@@ -1,23 +1,28 @@
 import { fakeTableData } from '../../model/tableModel';
-import { Table } from '../../types';
+import { fakeOrderData } from '../../model/orderModel';
+import { Order, Table } from '../../types';
 import pubsub from '../pubsub';
 
 let expireTimers: any = {};
 
 const updateTableState = (id: number, newState: boolean, data: Table[]) => {
     const Index = data.findIndex(table => table.id === Number(id));
+    const availableStatus = [0, 1, 2];
+    const orderInThisTable = fakeOrderData.find((order: Order) => order.tableId === id && availableStatus.includes(order.status));
 
-    data[Index] = {
-        ...data[Index],
-        state: newState,
-    };
+    if (!orderInThisTable) {
+        data[Index] = {
+            ...data[Index],
+            state: newState,
+        };
 
-    pubsub.publish('CHANGE_TABLE_STATUS', {
-        ChangeTableStatus: data.map(table => ({
-            data: table,
-            message: ''
-        }))
-    });
+        pubsub.publish('CHANGE_TABLE_STATUS', {
+            ChangeTableStatus: data.map(table => ({
+                data: table,
+                message: ''
+            }))
+        });
+    }
 
     return data[Index];
 };
