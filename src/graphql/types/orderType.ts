@@ -15,6 +15,7 @@ const orderType = gql`
         id: ID!
         bartenderId: ID!
         tableId: ID!
+        tableCode: ID
         value: Float!
         date: Date!
         status: Int! #  0: Concluído, 1: Resgatado, 2: Confirmado, 3: Finalizado
@@ -33,6 +34,7 @@ const orderType = gql`
         id: ID!
         bartenderId: ID!
         tableId: ID!
+        tableCode: ID
         value: Float!
         date: Date!
         status: Int!

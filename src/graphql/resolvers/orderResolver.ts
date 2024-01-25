@@ -12,7 +12,7 @@ const orderResolver = {
 
     Mutation: {
         createOrder: (_: any, { input }: any) => {
-            const { bartenderId, tableId, date, status } = input;
+            const { bartenderId, tableId, tableCode, date, status } = input;
             const items = input.items;
             let sumItemsValue = 0;
 
@@ -36,6 +36,7 @@ const orderResolver = {
                 id: newOrderId,
                 bartenderId,
                 tableId,
+                tableCode,
                 value: sumItemsValue,
                 date,
                 status,
@@ -58,7 +59,7 @@ const orderResolver = {
             };
         },
         updateOrder: (_: any, { input }: any) => {
-            const { id, bartenderId, tableId, value, date, status } = input;
+            const { id, bartenderId, tableId, tableCode, value, date, status } = input;
             const items = input.items;
 
             const index = fakeOrderData.findIndex(order => order.id === Number(id));
@@ -66,6 +67,7 @@ const orderResolver = {
                 ...fakeOrderData[index],
                 bartenderId,
                 tableId,
+                tableCode,
                 value,
                 date,
                 status,
