@@ -14,12 +14,12 @@ const orderType = gql`
     type Order {
         id: ID!
         bartenderId: ID!
-        tableId: ID!
+        tableId: ID
         tableCode: ID
-        value: Float!
-        date: Date!
-        status: Int! #  0: Concluído, 1: Resgatado, 2: Confirmado, 3: Finalizado
-        items: [OrderItems]!
+        value: Float
+        date: Date
+        status: Int! #  0: Concluído, 1: Resgatado, 2: Confirmado, 3: Finalizado, 4: Cancelado
+        items: [OrderItems]
     }
 
     input OrderItemsInput {
@@ -33,12 +33,12 @@ const orderType = gql`
     input OrderInput {
         id: ID!
         bartenderId: ID!
-        tableId: ID!
+        tableId: ID
         tableCode: ID
-        value: Float!
-        date: Date!
+        value: Float
+        date: Date
         status: Int!
-        items: [OrderItemsInput!]!
+        items: [OrderItemsInput]
     }
 
     input OrderStatusInput {

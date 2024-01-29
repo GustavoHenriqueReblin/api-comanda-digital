@@ -44,7 +44,7 @@ const orderResolver = {
             };
             fakeOrderData.push(newOrder);
 
-            const statusToReturn = [0, 1, 2];
+            const statusToReturn = [0, 1, 2, 3, 4];
             const Orders = fakeOrderData.filter(order => statusToReturn.includes(order.status));
             pubsub.publish('CHANGE_ORDER_STATUS', {
                 ChangeOrderStatus: Orders.map(order => ({
@@ -61,20 +61,39 @@ const orderResolver = {
         updateOrder: (_: any, { input }: any) => {
             const { id, bartenderId, tableId, tableCode, value, date, status } = input;
             const items = input.items;
-
+        
             const index = fakeOrderData.findIndex(order => order.id === Number(id));
-            fakeOrderData[index] = {
-                ...fakeOrderData[index],
-                bartenderId,
-                tableId,
-                tableCode,
-                value,
-                date,
-                status,
-                items: items.map((item: any) => {
+            const updatedOrder = { ...fakeOrderData[index] };
+        
+            if (bartenderId !== undefined) {
+                updatedOrder.bartenderId = bartenderId;
+            }
+        
+            if (tableId !== undefined) {
+                updatedOrder.tableId = tableId;
+            }
+        
+            if (tableCode !== undefined) {
+                updatedOrder.tableCode = tableCode;
+            }
+        
+            if (value !== undefined) {
+                updatedOrder.value = value;
+            }
+        
+            if (date !== undefined) {
+                updatedOrder.date = date;
+            }
+        
+            if (status !== undefined) {
+                updatedOrder.status = status;
+            }
+        
+            if (items !== undefined) {
+                updatedOrder.items = items.map((item: any) => {
                     const itemIndex = fakeOrderItemsData.findIndex(existingItem => existingItem.id === Number(item.id));
-
-                    if (itemIndex !== -1) { 
+        
+                    if (itemIndex !== -1) {
                         // Atualiza o item existente
                         fakeOrderItemsData[itemIndex] = {
                             ...fakeOrderItemsData[itemIndex],
@@ -83,7 +102,7 @@ const orderResolver = {
                             status: item.status
                         };
                         return fakeOrderItemsData[itemIndex];
-                    } else { 
+                    } else {
                         // Adiciona o novo item
                         const newItem = {
                             id: nextId(fakeOrderItemsData),
@@ -95,9 +114,11 @@ const orderResolver = {
                         fakeOrderItemsData.push(newItem);
                         return newItem;
                     }
-                })
-            };
-
+                });
+            }
+        
+            fakeOrderData[index] = updatedOrder;
+        
             const statusToReturn = [0, 1, 2];
             const Orders = fakeOrderData.filter(order => statusToReturn.includes(order.status));
             pubsub.publish('CHANGE_ORDER_STATUS', {
@@ -106,12 +127,12 @@ const orderResolver = {
                     message: ''
                 }))
             });
-            
+        
             return {
                 data: fakeOrderData[index],
                 message: 'Pedido atualizado com sucesso!',
             };
-        },
+        },        
     },
 
     Subscription: {
