@@ -5,6 +5,14 @@ import pubsub from '../pubsub';
 
 const orderResolver = {
     Query: {
+        order: (_: any, { input }: any) => {
+            const { id } = input;
+            const order = fakeOrderData.find(order => order.id === Number(id));
+            if (order) {
+                return order;
+            }
+            return null;
+        },
         orders: (_: any, { input }: any) => {
             return fakeOrderData.filter(order => input.status.includes(order.status));
         },
