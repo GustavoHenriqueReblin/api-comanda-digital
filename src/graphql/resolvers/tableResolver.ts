@@ -5,9 +5,16 @@ import pubsub from '../pubsub';
 
 let expireTimers: any = {};
 
-const updateTableState = (id: number, newState: boolean, data: Table[]) => {
-    const Index = data.findIndex(table => table.id === Number(id));
+const updateTableState = (id: number, code: number, newState: boolean, data: Table[]) => {
     const availableStatus = [0, 1, 2];
+    
+    if (id <= 0) { // Busca pelo código da mesa
+        const tableData = fakeTableData.find((table: Table) => table.code === code);
+        if (tableData) {
+            id = tableData.id;
+        }
+    } 
+    const Index = data.findIndex(table => table.id === Number(id));
     const orderInThisTable = fakeOrderData.find((order: Order) => order.tableId === id && availableStatus.includes(order.status));
 
     if (!orderInThisTable) {
@@ -36,13 +43,13 @@ const tableResolver = {
 
     Mutation: {
         updateTable: (_: any, { input }: any) => {
-            const { id, state } = input;
+            const { id, code, state } = input;
             expireTimers[id] && clearTimeout(expireTimers[id]);
-            const tableData = updateTableState(id, state, fakeTableData);
+            const tableData = updateTableState(id, code, state, fakeTableData);
 
             if (!state) {
                 expireTimers[id] = setTimeout(() => {
-                    updateTableState(id, !state, fakeTableData);
+                    updateTableState(id, code, !state, fakeTableData);
                 }, 10 * 60 * 1000); // 10 minutos
             };
         
