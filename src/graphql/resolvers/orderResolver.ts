@@ -127,7 +127,7 @@ const orderResolver = {
         
             fakeOrderData[index] = updatedOrder;
         
-            const statusToReturn = [0, 1, 2];
+            const statusToReturn = [0, 1, 2, 4];
             const Orders = fakeOrderData.filter(order => statusToReturn.includes(order.status));
             pubsub.publish('CHANGE_ORDER_STATUS', {
                 ChangeOrderStatus: Orders.map(order => ({
