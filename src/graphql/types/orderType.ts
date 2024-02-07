@@ -14,6 +14,7 @@ const orderType = gql`
     type Order {
         id: ID!
         bartenderId: ID!
+        bertenderName: String
         tableId: ID
         tableCode: ID
         value: Float
@@ -33,6 +34,7 @@ const orderType = gql`
     input OrderInput {
         id: ID!
         bartenderId: ID!
+        bertenderName: String
         tableId: ID
         tableCode: ID
         value: Float
