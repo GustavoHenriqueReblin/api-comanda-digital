@@ -12,14 +12,26 @@ const userResolver = {
             const user = fakeUserData.find(user => user.username === username && user.password === password);
             return verifyUserToken(user);
         },
-        getIdByToken: (_: any, { input }: any) => {
+        getUserByToken: (_: any, { input }: any) => {
             const { token } = input;
-            const user = fakeUserData.find(user => user.token === token);
-            if (user) {
-                const decoded = jwt.verify(user.token, process.env.SECRET_KEY);
-                return decoded.id;
+            try {
+                const tokenTreaty = token.charAt(0) === '"' ? token.match(/"([^"]*)"/)[1] : token;
+                const decodedToken = jwt.verify(tokenTreaty, process.env.SECRET_KEY);
+                console.log(fakeUserData);
+                
+                const user = fakeUserData.find(user => user.id === Number(decodedToken.id) && user.token === tokenTreaty);
+                if (!user) throw "Usuário não encontrado! ";
+                
+                return user;
+            } catch (error) {
+                console.error("Erro ao buscar dados pelo token informado: " + error);
+                return {
+                    id: -1,
+                    username: "",
+                    password: "",
+                    token: "",
+                };
             }
-            return -1;
         },
     },
 

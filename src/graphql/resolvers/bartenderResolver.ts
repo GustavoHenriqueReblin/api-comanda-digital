@@ -45,28 +45,20 @@ const bartenderResolver = {
                 message: ""
             }));
         },
-        getDataByToken: (_: any, { input }: any) => {
+        getBartenderByToken: (_: any, { input }: any) => {
             const { token } = input;
             try {
-                let tokenTreaty = token;
-                tokenTreaty = token.charAt(0) === '"' && token.match(/"([^"]*)"/)[1];
-                const decoded = jwt.verify(tokenTreaty, process.env.SECRET_KEY);
-
-                const bartender = {
-                    id: decoded.id,
-                    name: decoded.name,
-                    securityCode: decoded.securityCode,
-                    token: "",
-                    isWaiting: decoded.isWaiting,
-                    isApproved: decoded.isApproved,
-                };
+                const tokenTreaty = token.charAt(0) === '"' ? token.match(/"([^"]*)"/)[1] : token;
+                const decodedToken = jwt.verify(tokenTreaty, process.env.SECRET_KEY);
+                const bartender = fakeBartenderData.find(bartender => bartender.id === Number(decodedToken.id) && bartender.token === tokenTreaty);
+                if (!bartender) throw "Garçom não encontrado! ";
 
                 return {
                     data: bartender,
                     message: ""
                 };
             } catch (error) {
-                console.log("Erro ao buscar dados pelo token informado: " + error);
+                console.error("Erro ao buscar dados pelo token informado: " + error);
                 return {
                     data: {
                         id: -1,
@@ -75,7 +67,7 @@ const bartenderResolver = {
                         token: "",
                         isWaiting: false
                     },
-                    message: ""
+                    message: "Erro ao buscar dados pelo token informado: " + error
                 };
             }
         },
