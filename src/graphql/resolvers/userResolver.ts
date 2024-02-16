@@ -17,7 +17,6 @@ const userResolver = {
             try {
                 const tokenTreaty = token.charAt(0) === '"' ? token.match(/"([^"]*)"/)[1] : token;
                 const decodedToken = jwt.verify(tokenTreaty, process.env.SECRET_KEY);
-                console.log(fakeUserData);
                 
                 const user = fakeUserData.find(user => user.id === Number(decodedToken.id) && user.token === tokenTreaty);
                 if (!user) throw "Usuário não encontrado! ";
