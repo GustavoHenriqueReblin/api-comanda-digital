@@ -3,27 +3,34 @@ import gql from 'graphql-tag';
 const userType = gql`
     type User {
         id: ID!
-        username: String!
+        name: String
+        email: String!
         password: String!
-        token: String!
+        token: String
     }
 
     input UserInput {
-        id: ID
-        username: String
+        id: ID!
+        name: String
+        email: String
         password: String
         token: String
     }
 
+    type UserResponse {
+        data: [User]
+        message: String
+    }
+
     type Query {
-        users: [User!],
-        user(input: UserInput!): User,
-        getUserByToken(input: UserInput!): User
+        users: UserResponse!,
+        user(input: UserInput!): UserResponse!,
+        getUserByToken(input: UserInput!): UserResponse!
     }
 
     type Mutation {
-        createUser(input: UserInput!): User!
-        updateUser(input: UserInput!): User!
+        # createUser(input: UserInput!): UserResponse!
+        updateUser(input: UserInput!): UserResponse
     }
 `;
 

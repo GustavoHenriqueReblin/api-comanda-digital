@@ -1,6 +1,7 @@
 export type User = {
     id: number,
-    username: string,
+    name: string,
+    email: string,
     password: string,
     token: string
 };
@@ -52,4 +53,3 @@ export type Order = {
     status: number, // 0: Concluído, 1: Resgatado, 2: Confirmado, 3: Finalizado, 4: Cancelado
     items: [OrderItems],
 };
-

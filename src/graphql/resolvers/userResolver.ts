@@ -1,57 +1,67 @@
-import { fakeUserData } from '../../model/userModel';
-import { nextId, verifyUserToken } from '../../helper';
+import { getAllUsers, getUser, getUserById, getUserByToken, updateUser } from '../../model/userModel';
+import { verifyUserToken } from '../../helper';
+import { User } from '../../types';
 const jwt = require('jsonwebtoken');
 
 const userResolver = {
     Query: {
-        users: () => {
-            return fakeUserData;
+        users: async () => {
+            const users = await getAllUsers();
+            return {
+                data: users,
+                message: '',
+            };
         },
-        user: (_: any, { input }: any) => {
-            const { username, password } = input;
-            const user = fakeUserData.find(user => user.username === username && user.password === password);
-            return verifyUserToken(user);
+
+        user: async (_: any, { input }: any) => {
+            const { email, password } = input;
+            const user = verifyUserToken(await getUser(email, password));
+            const message = user ? '' : 'Usuário não encontrado!';
+            return {
+                data: [user],
+                message: message,
+            }
         },
-        getUserByToken: (_: any, { input }: any) => {
+
+        getUserByToken: async (_: any, { input }: any) => {
             const { token } = input;
             try {
                 const tokenTreaty = token.charAt(0) === '"' ? token.match(/"([^"]*)"/)[1] : token;
-                const decodedToken = jwt.verify(tokenTreaty, process.env.SECRET_KEY);
-                
-                const user = fakeUserData.find(user => user.id === Number(decodedToken.id) && user.token === tokenTreaty);
+                jwt.verify(tokenTreaty, process.env.SECRET_KEY);
+                const user = await getUserByToken(tokenTreaty);
                 if (!user) throw "Usuário não encontrado! ";
                 
-                return user;
-            } catch (error) {
-                console.error("Erro ao buscar dados pelo token informado: " + error);
                 return {
-                    id: -1,
-                    username: "",
-                    password: "",
-                    token: "",
+                    data: [user],
+                    message: '',
+                };
+            } catch (error) {
+                const message = "Erro ao buscar usuário pelo token: ";
+                console.error(message + error);
+                return { 
+                    data: [null], 
+                    message: message + error,
                 };
             }
         },
     },
 
     Mutation: {
-        createUser: (_: any, args: any, __: any) => {
-            const { username, password } = args.input;
-            const newUser: any = {
-                id: nextId(fakeUserData),
-                username: username,
-                password: password,
-                token: ""
-            };
-            fakeUserData.push(newUser);
-            return newUser;
-        }, 
-
-        updateUser: (_: any, args: any, __: any) => {
-            const { id } = args.input;
-            const Index = fakeUserData.findIndex(user => user.id === Number(id));
-
-            return verifyUserToken(fakeUserData[Index], false);
+        updateUser: async (_: any, { input }: any, __: any) => {
+            const affectedRows = await updateUser(input);
+            const user = affectedRows && await getUserById(input.id);
+            
+            const message = user ? 'Usuário atualizado com sucesso!' : 'Usuário não encontrado!';
+            const data = user ? [user] : [{
+                id: -1, 
+                email: '',
+                password: ''
+            } as User];
+            
+            return {
+                data: data,
+                message: message,
+            }
         },
     }
   };
