@@ -6,7 +6,7 @@ const productType = gql`
         idCategory: ID!
         name: String!
         price: Float!
-        description: String!
+        description: String
     }
 
     input FilterInput {
