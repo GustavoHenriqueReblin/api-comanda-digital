@@ -19,4 +19,4 @@ const productType = gql`
     }
 `;
 
-module.exports = productType;
+export default productType;

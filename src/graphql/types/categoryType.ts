@@ -11,4 +11,4 @@ const categoryType = gql`
     }
 `;
 
-module.exports = categoryType;
+export default categoryType;

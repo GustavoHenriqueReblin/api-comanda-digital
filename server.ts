@@ -8,40 +8,41 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { expressMiddleware } from "@apollo/server/express4"
 import cors from 'cors';
 import bodyParser from 'body-parser';
-const schemaGraphQL = require('./src/graphql/schema');
-require('dotenv').config();
+import schemaGraphQL from './src/graphql/schema';
+import dotenv from "dotenv";
 
-( async function () {
-    const app = express();
-    const httpServer = createServer(app);
+dotenv.config();
 
-    const { typeDefs, resolvers } = schemaGraphQL;
-    const schema = makeExecutableSchema({typeDefs, resolvers});
-    const wsServer = new WebSocketServer({
-        server: httpServer,
-        path: "/graphql"
-    });
+const app = express();
+const httpServer = createServer(app);
 
-    const serverCleanup = useServer({ schema }, wsServer);
-    const server = new ApolloServer({
-        schema,
-        plugins: [
-            ApolloServerPluginDrainHttpServer({ httpServer }),
-            {
-                async serverWillStart() {
-                    return {
-                        async drainServer() {
-                            await serverCleanup.dispose();
-                        }
+const { typeDefs, resolvers } = schemaGraphQL;
+const schema = makeExecutableSchema({typeDefs, resolvers});
+const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: "/"
+});
+
+const serverCleanup = useServer({ schema }, wsServer);
+const server = new ApolloServer({
+    schema,
+    plugins: [
+        ApolloServerPluginDrainHttpServer({ httpServer }),
+        {
+            async serverWillStart() {
+                return {
+                    async drainServer() {
+                        await serverCleanup.dispose();
                     }
                 }
             }
-        ]
-    });
+        }
+    ]
+});
 
-    await server.start();
-    app.use('/graphql', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server));
+server.start().then(() => {
+    app.use('/', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server));
     httpServer.listen(process.env.PORT, Number(process.env.IP), () => {
-        console.log(`Server running on http://${process.env.IP}:${process.env.PORT}/graphql`);
+        console.log(`Server running on http://${process.env.IP}:${process.env.PORT}/`);
     });
-})();
+});

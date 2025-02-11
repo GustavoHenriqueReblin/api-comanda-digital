@@ -8,4 +8,4 @@ const categoryResolver = {
     }
 };
   
-module.exports = categoryResolver;
+export default categoryResolver;

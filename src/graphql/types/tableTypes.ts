@@ -31,4 +31,4 @@ const tableType = gql`
     }
 `;
 
-module.exports = tableType;
+export default tableType;

@@ -8,7 +8,11 @@ const bartenderResolver = {
         bartenders: () => {
             return fakeBartenderData;
         },
-        bartender: (_: any, { input }: any) => {
+        bartender: (a: any, { input }: any, b: any) => {
+            console.log(a);
+            console.log(input);
+            console.log(b);
+            
             const { securityCode } = input;
             const dataWithoutIsApproved = fakeBartenderData.map(({ isApproved, ...rest }) => rest);
             let bartender = dataWithoutIsApproved.find(bartender => bartender.securityCode === securityCode);
@@ -120,4 +124,4 @@ const bartenderResolver = {
     },
 };
   
-module.exports = bartenderResolver;
+export default bartenderResolver;

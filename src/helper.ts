@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
 import { fakeBartenderData } from './model/bartenderModel';
-import { updateUser } from './model/userModel';
 import { User } from './types';
-require('dotenv').config();
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const verifyUserToken = (user?: User, sendNewToken: boolean = true) => {
     if (user) {
@@ -33,7 +34,7 @@ export const verifyUserToken = (user?: User, sendNewToken: boolean = true) => {
             }
         }
 
-        updateUser(user);
+        // updateUser(user);
     }
     
     // Retorna apenas o usuário vazio (não encontrado) ou já autenticado

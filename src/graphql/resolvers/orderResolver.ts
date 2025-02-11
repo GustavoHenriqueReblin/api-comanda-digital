@@ -157,4 +157,4 @@ const orderResolver = {
     },
 };
   
-module.exports = orderResolver;
+export default orderResolver;

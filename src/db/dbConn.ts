@@ -1,5 +1,7 @@
-const mysql = require("mysql2/promise");
-require("dotenv").config();
+import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const dbConn = mysql.createPool({
     host: process.env.MYSQL_HOST,

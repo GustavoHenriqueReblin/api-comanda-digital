@@ -44,4 +44,4 @@ const bartenderType = gql`
     }
 `;
 
-module.exports = bartenderType;
+export default bartenderType;

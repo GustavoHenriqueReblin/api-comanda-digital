@@ -72,4 +72,4 @@ const orderType = gql`
     }
 `;
 
-module.exports = orderType;
+export default orderType;

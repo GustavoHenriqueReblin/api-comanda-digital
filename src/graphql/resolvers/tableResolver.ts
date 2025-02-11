@@ -69,4 +69,4 @@ const tableResolver = {
     },
 };
   
-module.exports = tableResolver;
+export default tableResolver;

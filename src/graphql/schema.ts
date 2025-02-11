@@ -1,26 +1,15 @@
-import gql from 'graphql-tag';
-const userResolver = require('./resolvers/userResolver');
-const userTypeSchema = require('./types/userType');
-const categoryResolver = require('./resolvers/categoryResolver');
-const categoryTypeSchema = require('./types/categoryType');
-const productResolver = require('./resolvers/productResolver');
-const productTypeSchema = require('./types/productType');
-const tableResolver = require('./resolvers/tableResolver');
-const tableTypeSchema = require('./types/tableTypes');
-const bartenderResolver = require('./resolvers/bartenderResolver');
-const bartenderTypeSchema = require('./types/bartenderType');
-const orderResolver = require('./resolvers/orderResolver');
-const orderTypeSchema = require('./types/orderType');
-
-const rootSchema = gql`
-    type Query {
-        dummy: Boolean
-    }
-
-    type Mutation {
-        dummy: Boolean
-    }
-`;
+import userResolver from './resolvers/userResolver';
+import userTypeSchema from './types/userType';
+import categoryResolver from './resolvers/categoryResolver';
+import categoryTypeSchema from './types/categoryType';
+import productResolver from './resolvers/productResolver';
+import productTypeSchema from './types/productType';
+import tableResolver from './resolvers/tableResolver';
+import tableTypeSchema from './types/tableTypes';
+import bartenderResolver from './resolvers/bartenderResolver';
+import bartenderTypeSchema from './types/bartenderType';
+import orderResolver from './resolvers/orderResolver';
+import orderTypeSchema from './types/orderType';
 
 const schema = {
     typeDefs: [
@@ -31,4 +20,4 @@ const schema = {
     ],
 };
 
-module.exports = schema;
+export default schema;

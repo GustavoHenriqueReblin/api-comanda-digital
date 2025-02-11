@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd --respawn --transpile-only server.ts"
+    "dev": "tsx watch server.ts"
   },
   "keywords": [],
   "author": "",
@@ -27,7 +27,9 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.8",
     "@types/ws": "^8.5.10",
-    "ts-node-dev": "^2.0.0"
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.19.2"
   }
 }
