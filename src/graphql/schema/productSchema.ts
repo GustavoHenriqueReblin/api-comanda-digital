@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const productType = gql`
+const productSchema = gql`
     type Product {
         id: ID!
         idCategory: ID!
@@ -19,4 +19,4 @@ const productType = gql`
     }
 `;
 
-export default productType;
+export default productSchema;

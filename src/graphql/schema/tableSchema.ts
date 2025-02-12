@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const tableType = gql`
+const tableSchema = gql`
     type Table {
         id: ID!
         code: Int!
@@ -31,4 +31,4 @@ const tableType = gql`
     }
 `;
 
-export default tableType;
+export default tableSchema;

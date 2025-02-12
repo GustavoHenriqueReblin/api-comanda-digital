@@ -1,22 +1,22 @@
 import userResolver from './resolvers/userResolver';
-import userTypeSchema from './types/userType';
+import userTypeSchema from './schema/userSchema';
 import categoryResolver from './resolvers/categoryResolver';
-import categoryTypeSchema from './types/categoryType';
+import categoryTypeSchema from './schema/categorySchema';
 import productResolver from './resolvers/productResolver';
-import productTypeSchema from './types/productType';
+import productTypeSchema from './schema/productSchema';
 import tableResolver from './resolvers/tableResolver';
-import tableTypeSchema from './types/tableTypes';
+import tableTypeSchema from './schema/tableSchema';
 import bartenderResolver from './resolvers/bartenderResolver';
-import bartenderTypeSchema from './types/bartenderType';
+import bartenderTypeSchema from './schema/bartenderSchema';
 import orderResolver from './resolvers/orderResolver';
-import orderTypeSchema from './types/orderType';
+import orderTypeSchema from './schema/orderSchema';
 
 const schema = {
     typeDefs: [
-        userTypeSchema, categoryTypeSchema, productTypeSchema, tableTypeSchema, bartenderTypeSchema, orderTypeSchema
+        userTypeSchema //, categoryTypeSchema, productTypeSchema, tableTypeSchema, bartenderTypeSchema, orderTypeSchema
     ],
     resolvers: [
-        userResolver, categoryResolver, productResolver, tableResolver, bartenderResolver, orderResolver
+        userResolver, // categoryResolver, productResolver, tableResolver, bartenderResolver, orderResolver
     ],
 };
 

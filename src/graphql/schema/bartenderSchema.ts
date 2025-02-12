@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const bartenderType = gql`
+const bartenderSchema = gql`
     type Bartender {
         id: ID!
         name: String!
@@ -44,4 +44,4 @@ const bartenderType = gql`
     }
 `;
 
-export default bartenderType;
+export default bartenderSchema;

@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const orderType = gql`
+const orderSchema = gql`
     scalar Date
 
     type OrderItems {
@@ -72,4 +72,4 @@ const orderType = gql`
     }
 `;
 
-export default orderType;
+export default orderSchema;

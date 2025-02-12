@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const categoryType = gql`
+const categorySchema = gql`
     type Category {
         id: ID!
         name: String!
@@ -11,4 +11,4 @@ const categoryType = gql`
     }
 `;
 
-export default categoryType;
+export default categorySchema;

@@ -1,3 +1,10 @@
+import { Request, Response } from "express";
+
+export type GraphQLContext = {
+    req: any;
+    res: Response;
+}
+
 export type User = {
     id: number,
     name: string,

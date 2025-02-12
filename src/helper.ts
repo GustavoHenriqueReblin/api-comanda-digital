@@ -5,42 +5,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const verifyUserToken = (user?: User, sendNewToken: boolean = true) => {
-    if (user) {
-        if (user.token) { 
-            // Verifica o token
-            try {
-                jwt.verify(user.token, process.env.SECRET_KEY);
-            } catch (error: any) {
-                if (error.message = "jwt expired") {
-                    user.token = "";
-                }
-            }
-        } else {
-            // Cria um novo token e o retorna
-            const payload = {
-                id: user.id,
-                email: user.email,
-                password: user.password,
-            };
-
-            const options = {
-                expiresIn: '1d', 
-                algorithm: 'HS256', 
-            };
-
-            if (sendNewToken) {
-                user.token = jwt.sign(payload, process.env.SECRET_KEY, options);
-            }
-        }
-
-        // updateUser(user);
-    }
-    
-    // Retorna apenas o usuário vazio (não encontrado) ou já autenticado
-    return user;
-};
-
 export const verifyBartenderToken = (token: string, id: string) => {
     let result = "";
     const bartender = fakeBartenderData.find(bartender => bartender.id === Number(id));

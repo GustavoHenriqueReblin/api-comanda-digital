@@ -10,6 +10,13 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import schemaGraphQL from './src/graphql/schema';
 import dotenv from "dotenv";
+import { authenticate } from './src/graphql/middleware';
+import cookieParser from "cookie-parser";
+
+const corsOptions = {
+    origin: 'https://studio.apollographql.com',
+    credentials: true,
+};
 
 dotenv.config();
 
@@ -37,12 +44,30 @@ const server = new ApolloServer({
                 }
             }
         }
-    ]
+    ],
+    formatError: (err) => {
+        return {
+            message: err.message,
+            code: err.extensions?.code || 'UNKNOWN_ERROR',
+        };
+    },
 });
 
 server.start().then(() => {
-    app.use('/', cors<cors.CorsRequest>(), bodyParser.json(), expressMiddleware(server));
-    httpServer.listen(process.env.PORT, Number(process.env.IP), () => {
-        console.log(`Server running on http://${process.env.IP}:${process.env.PORT}/`);
+    app.use(
+        "/",
+        cors(corsOptions),
+        bodyParser.json(),
+        cookieParser(),
+        authenticate,
+        expressMiddleware(server, {
+            context: async (context: any) => {
+                return context;
+            },
+        })
+    );
+  
+    httpServer.listen(process.env.PORT, () => {
+      console.log(`Server running on http://localhost:${process.env.PORT}/`);
     });
 });
