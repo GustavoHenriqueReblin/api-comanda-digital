@@ -29,9 +29,8 @@ const userResolver = {
                     );
         
                     context.res.cookie(process.env.COOKIE_AUTH_TOKEN_NAME ?? "", token, {
-                        httpOnly: true,
-                        secure: false,
-                        sameSite: "none", // Permite cookies em requests cross-origin
+                        httpOnly: false,
+                        secure: true,
                         maxAge: 3600000,
                     });
 

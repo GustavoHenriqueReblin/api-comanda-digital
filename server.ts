@@ -14,7 +14,7 @@ import { authenticate } from './src/graphql/middleware';
 import cookieParser from "cookie-parser";
 
 const corsOptions = {
-    origin: 'https://studio.apollographql.com',
+    origin: ['https://studio.apollographql.com', 'http://localhost:3000'],
     credentials: true,
 };
 
