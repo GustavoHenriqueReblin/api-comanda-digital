@@ -14,13 +14,13 @@ const userSchema = gql`
         password: String
     }
 
-    input UserInput {
-        id: ID
-        name: String
-        email: String
-        password: String
-        token: String
-    }
+    # input UserInput {
+    #     id: ID
+    #     name: String
+    #     email: String
+    #     password: String
+    #     token: String
+    # }
 
     type UserResponse {
         data: [User]

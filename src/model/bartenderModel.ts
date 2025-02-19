@@ -1,8 +1,19 @@
+import db from '../../knex';
 import { Bartender } from '../types';
 
-export const fakeBartenderData: Bartender[] = [
-    { id: 1, name: "Jonas", securityCode: "105", token: "", isWaiting: false, isApproved: false },
-    { id: 2, name: "Carla", securityCode: "107", token: "", isWaiting: false, isApproved: false },
-    { id: 3, name: "Pedro", securityCode: "601", token: "", isWaiting: false, isApproved: false },
-    { id: 4, name: "Marina", securityCode: "1048", token: "", isWaiting: false, isApproved: false },
-];
+interface FindBartenderParams {
+    securityCode?: number;
+}
+
+export const findBartender = async ({ securityCode }: FindBartenderParams): Promise<Bartender | null> => {
+    try {
+        const query = db<Bartender>('bartender');
+
+        return await query
+            .where({ securityCode })
+            .first() as Bartender | null;
+    } catch (err) {
+        console.error('Erro ao buscar garçom:', err);
+        throw new Error('Erro ao buscar garçom');
+    }
+};

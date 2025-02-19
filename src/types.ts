@@ -35,10 +35,8 @@ export type Table = {
 export type Bartender = {
     id: number,
     name: string,
-    securityCode: string,
+    securityCode: number,
     token: string,
-    isWaiting: boolean,
-    isApproved: boolean,
 };
 
 export type OrderItems = {

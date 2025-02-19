@@ -2,22 +2,12 @@ import { findUser, updateUser } from '../../model/userModel';
 import { GraphQLError } from 'graphql';
 import { GraphQLContext } from "../../types";
 import jwt from 'jsonwebtoken';
+import { privateRouteAuth } from '../middleware';
 
 const userResolver = {
     Query: {
         user: async (_: any, __: any, context: GraphQLContext) => {
-            if (!context.req.user || !context.req.user.Id) {
-                throw new GraphQLError('Não autenticado', {
-                    extensions: { code: 'UNAUTHENTICATED' },
-                });
-            }
-            const user = await findUser({ id: context.req.user.Id, token: context.req.user.token });
-
-            if (!user) {
-                throw new GraphQLError('Não autenticado', {
-                    extensions: { code: 'UNAUTHENTICATED' },
-                });
-            }
+            const user = await privateRouteAuth(context);
 
             return {
                 data: [user],
@@ -35,7 +25,7 @@ const userResolver = {
                         { expiresIn: '1h' }
                     );
         
-                    context.res.cookie(process.env.COOKIE_AUTH_TOKEN_NAME ?? "", token, {
+                    context.res.cookie(process.env.COOKIE_AUTH_USER_TOKEN_NAME ?? "", token, {
                         httpOnly: false,
                         secure: true,
                         maxAge: 3600000,

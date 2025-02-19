@@ -4,15 +4,12 @@ const bartenderSchema = gql`
     type Bartender {
         id: ID!
         name: String!
-        securityCode: String!
-        token: String!
-        isWaiting: Boolean!
-        isApproved: Boolean
+        securityCode: Int!
+        token: String
     }
 
     type BartenderResponse {
-        data: Bartender
-        message: String
+        data: [Bartender]
     }
 
     input BartenderInput {
