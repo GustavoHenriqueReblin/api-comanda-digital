@@ -11,7 +11,14 @@ const userResolver = {
                     extensions: { code: 'UNAUTHENTICATED' },
                 });
             }
-            const user = await findUser({ id: context.req.user.Id });
+            const user = await findUser({ id: context.req.user.Id, token: context.req.user.token });
+
+            if (!user) {
+                throw new GraphQLError('Não autenticado', {
+                    extensions: { code: 'UNAUTHENTICATED' },
+                });
+            }
+
             return {
                 data: [user],
             };

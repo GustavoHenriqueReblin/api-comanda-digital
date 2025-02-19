@@ -5,6 +5,7 @@ interface FindUserParams {
     email?: string;
     password?: string;
     id?: number;
+    token?: string;
 }
 
 interface UpdateUserParams {
@@ -15,12 +16,15 @@ interface UpdateUserParams {
     token?: string;
 }
 
-export const findUser = async ({ id, email, password }: FindUserParams): Promise<User | null> => {
+export const findUser = async ({ id, email, password, token }: FindUserParams): Promise<User | null> => {
     try {
         const query = db<User>('user');
 
-        if (id) {
-            return await query.where({ id }).first() as User | null;
+        if (id && token) {
+            return await query
+                .where({ id })
+                .andWhere({ token })
+                .first() as User | null;
         }
 
         if (email && password) {
