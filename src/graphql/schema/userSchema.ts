@@ -29,7 +29,6 @@ const userSchema = gql`
     type Query {
         user: UserResponse!,
         login(input: LoginInput!): UserResponse!,
-        # getUserByToken(input: UserInput!): UserResponse!
     }
 
     # type Mutation {

@@ -1,4 +1,4 @@
-import { fakeUserData } from '../../model/userModel';
+import { findUser, updateUser } from '../../model/userModel';
 import { GraphQLError } from 'graphql';
 import { GraphQLContext } from "../../types";
 import jwt from 'jsonwebtoken';
@@ -11,7 +11,7 @@ const userResolver = {
                     extensions: { code: 'UNAUTHENTICATED' },
                 });
             }
-            const user = fakeUserData.find(user => user.id === context.req.user.Id as number);
+            const user = await findUser({ id: context.req.user.Id });
             return {
                 data: [user],
             };
@@ -20,7 +20,7 @@ const userResolver = {
         login: async (_: any, { input }: any, context: GraphQLContext) => {
             try {
                 const { email, password } = input;
-                const user = fakeUserData.find(user => user.email === email && user.password === password);
+                const user = await findUser({ email, password });
                 if (user) {
                     const token = jwt.sign(
                         { Id: user.id, email: user.email },
@@ -34,7 +34,7 @@ const userResolver = {
                         maxAge: 3600000,
                     });
 
-                    user.token = token;
+                    await updateUser({ id: user.id, token });
         
                     return {
                         data: [user],
@@ -44,33 +44,12 @@ const userResolver = {
                 return new GraphQLError('Usuário não encontrado', {
                     extensions: { code: 'NOT FOUND' },
                 });
-            } catch {
-                throw new GraphQLError('Falha ao buscar usuário', {
+            } catch (error) {
+                throw new GraphQLError('Falha ao buscar usuário - ' + error, {
                     extensions: { code: 'INTERNAL SERVER ERROR' },
                 });
             }
         },
-
-        // getUserByToken: (_: any, { input }: any) => {
-        //     const { token } = input;
-        //     try {
-        //         const tokenTreaty = token.charAt(0) === '"' ? token.match(/"([^"]*)"/)[1] : token;
-        //         const decodedToken = jwt.verify(tokenTreaty, process.env.SECRET_KEY);
-                
-        //         const user = fakeUserData.find(user => user.id === Number(decodedToken.id) && user.token === tokenTreaty);
-        //         if (!user) throw "Usuário não encontrado! ";
-                
-        //         return user;
-        //     } catch (error) {
-        //         console.error("Erro ao buscar dados pelo token informado: " + error);
-        //         return {
-        //             id: -1,
-        //             username: "",
-        //             password: "",
-        //             token: "",
-        //         };
-        //     }
-        // },
     },
 
     // Mutation: {
