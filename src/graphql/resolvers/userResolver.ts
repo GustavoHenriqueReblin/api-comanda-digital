@@ -2,12 +2,12 @@ import { findUser, updateUser } from '../../model/userModel';
 import { GraphQLError } from 'graphql';
 import { GraphQLContext } from "../../types";
 import jwt from 'jsonwebtoken';
-import { privateRouteAuth } from '../middleware';
+import { privateUserRouteAuth } from '../middleware';
 
 const userResolver = {
     Query: {
         user: async (_: any, __: any, context: GraphQLContext) => {
-            const user = await privateRouteAuth(context);
+            const user = await privateUserRouteAuth(context);
 
             return {
                 data: [user],
@@ -48,15 +48,6 @@ const userResolver = {
             }
         },
     },
-
-    // Mutation: {
-    //     updateUser: (_: any, args: any, __: any) => {
-    //         const { id } = args.input;
-    //         const Index = fakeUserData.findIndex(user => user.id === Number(id));
-
-    //         return verifyUserToken(fakeUserData[Index], false);
-    //     },
-    // }
 };
   
 export default userResolver;

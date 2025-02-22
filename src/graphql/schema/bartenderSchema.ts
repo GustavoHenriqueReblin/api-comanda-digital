@@ -12,32 +12,47 @@ const bartenderSchema = gql`
         data: [Bartender]
     }
 
-    input BartenderInput {
-        token: String
-        securityCode: String!
+    type AuthBartenderResponse {
+        data: [Bartender]
+        authRequestStatus: Boolean!
     }
 
-    input UpdateBartenderInput {
-        id: ID!
-        isWaiting: Boolean
-        isApproved: Boolean
+    input BartenderInput {
         token: String
+        securityCode: String
+    }
+
+    # input UpdateBartenderInput {
+    #     id: ID!
+    #     isWaiting: Boolean
+    #     isApproved: Boolean
+    #     token: String
+    # }
+
+    input BartenderAccessInput {
+        bartenderId: Int!
+        response: Boolean!
+    }
+
+    input CancelAuthBartenderRequestInput {
+        bartenderId: Int!
     }
 
     type Query {
         bartenders: [Bartender!],
-        bartender(input: BartenderInput!): BartenderResponse!,
-        bartendersAreWaiting: [BartenderResponse],
-        getBartenderByToken(input: BartenderInput!): BartenderResponse
+        bartender(input: BartenderInput): BartenderResponse!,
+        bartendersAreWaiting: BartenderResponse!,
     }
 
     type Mutation {
-        updateBartender(input: UpdateBartenderInput!): BartenderResponse
+        # Chamado pelo admin ao aceitar/recusar a solicitação
+        bartenderAccess(input: BartenderAccessInput!): BartenderResponse!,
+        cancelAuthBartenderRequest(input: CancelAuthBartenderRequestInput!): BartenderResponse!,
     }
 
     type Subscription {
-        authBartenderRequest: [Bartender]
-        authBartenderResponse: Bartender
+        authBartenderRequest: [Bartender],
+        authBartenderResponse: AuthBartenderResponse,
     }
 `;
 

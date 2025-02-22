@@ -30,11 +30,6 @@ const userSchema = gql`
         user: UserResponse!,
         login(input: LoginInput!): UserResponse!,
     }
-
-    # type Mutation {
-    #    createUser(input: UserInput!): UserResponse!
-    #    updateUser(input: UserInput!): UserResponse
-    # }
 `;
 
 export default userSchema;

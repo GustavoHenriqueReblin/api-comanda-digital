@@ -12,6 +12,7 @@ import schemaGraphQL from './src/graphql/schema';
 import dotenv from "dotenv";
 import { authenticate } from './src/graphql/middleware';
 import cookieParser from "cookie-parser";
+import queue from './src/services/queue';
 
 const corsOptions = {
     origin: ['https://studio.apollographql.com', 'http://localhost:3000'],

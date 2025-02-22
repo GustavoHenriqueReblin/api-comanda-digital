@@ -1,9 +1,9 @@
 import pubsub from '../pubsub';
-import { findBartender } from '../../model/bartenderModel';
-import { verifyBartenderToken } from '../../helper';
-import { GraphQLContext } from '../../types';
+import { findBartender, updateBartender } from '../../model/bartenderModel';
+import { Bartender, GraphQLContext } from '../../types';
 const jwt = require('jsonwebtoken');
 import { GraphQLError } from 'graphql';
+import queue from '../../services/queue';
 
 const bartenderResolver = {
     Query: {
@@ -11,113 +11,154 @@ const bartenderResolver = {
         //     return fakeBartenderData;
         // },
         bartender: async (_: any, { input }: any, context: GraphQLContext) => {
-            const { securityCode } = input;
-            const bartender = await findBartender({ securityCode });
+            try {
+                const { securityCode, token } = input ?? {};
+                const bartender = await findBartender({ securityCode, token });
 
-            if (bartender) {
-                const token = jwt.sign(
-                    { Id: bartender.id, securityCode: bartender.securityCode },
-                    process.env.SECRET_KEY || 'secret',
-                    { expiresIn: '1h' }
-                );
-    
-                context.res.cookie(process.env.COOKIE_AUTH_BARTENDER_TOKEN_NAME ?? "", token, {
-                    httpOnly: false,
-                    secure: true,
-                    maxAge: 3600000,
+                if (bartender) {
+                    const token = jwt.sign(
+                        { Id: bartender.id, securityCode: bartender.securityCode },
+                        process.env.SECRET_KEY || 'secret',
+                        { expiresIn: '1h' }
+                    );
+        
+                    context.res.cookie(process.env.COOKIE_AUTH_BARTENDER_TOKEN_NAME ?? "", token, {
+                        httpOnly: false,
+                        secure: true,
+                        maxAge: 3600000,
+                    });
+
+                    await updateBartender({ id: bartender.id, token });
+
+                    let jobs = await queue.getJobs(["waiting"]);
+                    let newRequest = true;
+
+                    for (const job of jobs) {
+                        const bartenderInQueue = job.data.mensagem ? JSON.parse(job.data.mensagem) : null;
+                        if (bartenderInQueue && bartenderInQueue.id === bartender.id) {
+                            newRequest = false;
+                            break;
+                        }
+                    }
+
+                    if (newRequest) {
+                        await queue.add({ mensagem: JSON.stringify(bartender) });
+                        jobs = await queue.getJobs(["waiting"]);
+                        pubsub.publish(
+                            'BARTENDER_AUTH_REQUEST', 
+                            { authBartenderRequest: jobs.map((job) => job.data.mensagem ? JSON.parse(job.data.mensagem) : null) }
+                        );
+                    }
+        
+                    return {
+                        data: [bartender],
+                    };
+                }
+
+                return new GraphQLError('Garçom não encontrado', {
+                    extensions: { code: 'NOT FOUND' },
                 });
-
-                // await updateBartender({ id: user.id, token });
-    
-                return {
-                    data: [bartender],
-                };
+            } catch (error) {
+                throw new GraphQLError('Falha ao buscar garçom - ' + error, {
+                    extensions: { code: 'INTERNAL SERVER ERROR' },
+                });
             }
-
-            return new GraphQLError('Garçom não encontrado', {
-                extensions: { code: 'NOT FOUND' },
-            });
         },
-        // bartendersAreWaiting: () => {
-        //     const bartendersWaiting = fakeBartenderData.filter(bartender => bartender.isWaiting);
-        //     return bartendersWaiting.map(bartender => ({
-        //         data: bartender,
-        //         message: ""
-        //     }));
-        // },
-        // getBartenderByToken: (_: any, { input }: any) => {
-        //     const { token } = input;
-        //     try {
-        //         const tokenTreaty = token.charAt(0) === '"' ? token.match(/"([^"]*)"/)[1] : token;
-        //         const decodedToken = jwt.verify(tokenTreaty, process.env.SECRET_KEY);
-        //         const bartender = fakeBartenderData.find(bartender => bartender.id === Number(decodedToken.id) && bartender.token === tokenTreaty);
-        //         if (!bartender) throw "Garçom não encontrado! ";
-
-        //         return {
-        //             data: bartender,
-        //             message: ""
-        //         };
-        //     } catch (error) {
-        //         console.error("Erro ao buscar dados pelo token informado: " + error);
-        //         return {
-        //             data: {
-        //                 id: -1,
-        //                 name: "",
-        //                 securityCode: "",
-        //                 token: "",
-        //                 isWaiting: false
-        //             },
-        //             message: "Erro ao buscar dados pelo token informado: " + error
-        //         };
-        //     }
-        // },
+        bartendersAreWaiting: async (_: any, __: any, context: GraphQLContext) => {
+            // await privateUserRouteAuth(context);
+            const jobs = await queue.getJobs(["waiting"]);
+            console.log(jobs.map((job) => job.data.mensagem));
+            return {
+                data: jobs.filter((job) => !!job.data.mensagem).map((job) => JSON.parse(job.data.mensagem)) as Bartender[],
+            };
+        },
     },
 
-    // Mutation: {
-    //     updateBartender: (_: any, { input }: any) => {
-    //         const { id, isWaiting, isApproved, token } = input;
-    //         const Index = fakeBartenderData.findIndex(bartender => bartender.id === Number(id));
-    //         const sendAuthResponse = isApproved !== undefined;
-    //         const isApprovedNewValue = sendAuthResponse ? isApproved : fakeBartenderData[Index].isApproved;
+    Mutation: {
+        bartenderAccess: async (_: any, { input }: any, _context: GraphQLContext) => {
+            try {
+                // await privateUserRouteAuth(context);
+                const { bartenderId, response } = input;
 
-    //         // Atualiza os dados com o que foi passado na mutation
-    //         fakeBartenderData[Index] = {
-    //             ...fakeBartenderData[Index],
-    //             isWaiting: isWaiting,
-    //             isApproved: isApprovedNewValue,
-    //             token: sendAuthResponse && isApprovedNewValue ? verifyBartenderToken(token, id) : token,
-    //         };
+                const bartender = await findBartender({ id: bartenderId });
+                if (bartender) {
+                    const jobs = await queue.getJobs(["waiting"]);
+                    for (const job of jobs) {
+                        const bartenderInQueue = job.data.mensagem ? JSON.parse(job.data.mensagem) : null;
+                        if (bartenderInQueue && bartenderInQueue.id === bartender.id) {
+                            await job.remove();
+                            pubsub.publish(
+                                'BARTENDER_AUTH_RESPONSE', 
+                                { authBartenderResponse: { data: [bartender], authRequestStatus: response }}
+                            );
 
-    //         // Busca todos os garçons que estão aguardando aprovação para subscription retornar
-    //         const bartendersAreWaiting = fakeBartenderData.filter((bartender: any) => bartender.isWaiting);
+                            return {
+                                data: [bartender],
+                            }
+                        }
+                    }
+                }
 
-    //         if (bartendersAreWaiting.length > 0) {
-    //             pubsub.publish('BARTENDER_AUTH_REQUEST', { authBartenderRequest: bartendersAreWaiting });
-    //         }
-            
-    //         if (sendAuthResponse) {
-    //             pubsub.publish('BARTENDER_AUTH_RESPONSE', { authBartenderResponse: fakeBartenderData[Index] });
-    //         }
+                return new GraphQLError('Garçom não encontrado', {
+                    extensions: { code: 'NOT FOUND' },
+                });
+            } catch (error) {
+                throw new GraphQLError('Falha ao enviar resposta de solicitação - ' + error, {
+                    extensions: { code: 'INTERNAL SERVER ERROR' },
+                });
+            }
+        },
+
+        cancelAuthBartenderRequest: async (_: any, { input }: any, _context: GraphQLContext) => {
+            try {
+                const { bartenderId } = input;
         
-    //         return {
-    //             data: fakeBartenderData[Index],
-    //             message: 'Garçom atualizado com sucesso.',
-    //         };
-    //     },
-    // },
+                const bartender = await findBartender({ id: bartenderId });
+                if (!bartender) {
+                    return new GraphQLError('Garçom não encontrado', {
+                        extensions: { code: 'NOT FOUND' },
+                    });
+                }
+        
+                let jobs = await queue.getJobs(["waiting"]);
+                const updatedJobs: typeof jobs = [];
+        
+                for (const job of jobs) {
+                    const bartenderInQueue = job.data.mensagem ? JSON.parse(job.data.mensagem) : null;
+        
+                    if (bartenderInQueue && bartenderInQueue.id === bartender.id) {
+                        await job.remove();
+                    } else {
+                        updatedJobs.push(job);
+                    }
+                }
+        
+                pubsub.publish(
+                    'BARTENDER_AUTH_REQUEST',
+                    { authBartenderRequest: updatedJobs.map(job => JSON.parse(job.data.mensagem ?? "{}")) }
+                );
+        
+                return { data: [bartender] };
+            } catch (error) {
+                throw new GraphQLError('Falha ao cancelar solicitação - ' + error, {
+                    extensions: { code: 'INTERNAL SERVER ERROR' },
+                });
+            }
+        }        
+    },
 
-    // Subscription: {
-    //     authBartenderRequest: {
-    //         subscribe: () => {
-    //             return pubsub.asyncIterator(['BARTENDER_AUTH_REQUEST']);
-    //         },
-    //     },
-    //     authBartenderResponse: {
-    //         subscribe: () => {
-    //             return pubsub.asyncIterator(['BARTENDER_AUTH_RESPONSE']);
-    //         },
-    //     },
-    // },
+    Subscription: {
+        authBartenderRequest: {
+            subscribe: () => {
+                return pubsub.asyncIterator(['BARTENDER_AUTH_REQUEST']);
+            },
+        },
+        authBartenderResponse: {
+            subscribe: () => {
+                return pubsub.asyncIterator(['BARTENDER_AUTH_RESPONSE']);
+            },
+        },
+    },
 };
   
 export default bartenderResolver;
