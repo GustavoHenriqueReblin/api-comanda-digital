@@ -12,7 +12,7 @@ export const authenticate = (req: any, res: Response, next: NextFunction) => {
             try {
                 const decoded = jwt.verify(userToken, process.env.SECRET_KEY ?? "") as { Id: number, email: string };
                 req.user = {
-                    userToken,
+                    token: userToken,
                     ...decoded,
                 };
             } catch (err) {
@@ -27,7 +27,7 @@ export const authenticate = (req: any, res: Response, next: NextFunction) => {
             try {
                 const decoded = jwt.verify(bartenderToken, process.env.SECRET_KEY ?? "") as { Id: number, securityCode: number };
                 req.bartender = {
-                    bartenderToken,
+                    token: bartenderToken,
                     ...decoded,
                 };
             } catch (err) {

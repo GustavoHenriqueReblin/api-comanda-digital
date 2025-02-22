@@ -22,6 +22,10 @@ const bartenderSchema = gql`
         securityCode: String
     }
 
+    input BartenderLoginInput {
+        securityCode: String
+    }
+
     # input UpdateBartenderInput {
     #     id: ID!
     #     isWaiting: Boolean
@@ -41,6 +45,7 @@ const bartenderSchema = gql`
     type Query {
         bartenders: [Bartender!],
         bartender(input: BartenderInput): BartenderResponse!,
+        bartenderLogin(input: BartenderLoginInput!): BartenderResponse!,
         bartendersAreWaiting: BartenderResponse!,
     }
 

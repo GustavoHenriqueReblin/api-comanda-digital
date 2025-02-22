@@ -4,16 +4,17 @@ import { Bartender, GraphQLContext } from '../../types';
 const jwt = require('jsonwebtoken');
 import { GraphQLError } from 'graphql';
 import queue from '../../services/queue';
+import { privateBartenderRouteAuth, privateUserRouteAuth } from '../middleware';
 
 const bartenderResolver = {
     Query: {
         // bartenders: () => {
         //     return fakeBartenderData;
         // },
-        bartender: async (_: any, { input }: any, context: GraphQLContext) => {
+        bartenderLogin: async (_: any, { input }: any, context: GraphQLContext) => {
             try {
-                const { securityCode, token } = input ?? {};
-                const bartender = await findBartender({ securityCode, token });
+                const { securityCode } = input;
+                const bartender = await findBartender({ securityCode });
 
                 if (bartender) {
                     const token = jwt.sign(
@@ -64,8 +65,31 @@ const bartenderResolver = {
                 });
             }
         },
+
+        bartender: async (_: any, { input }: any, context: GraphQLContext) => {
+            try {
+                const bartenderAutenticated = await privateBartenderRouteAuth(context);
+                const { securityCode, token } = input ?? { securityCode: bartenderAutenticated.securityCode, token: bartenderAutenticated.token };
+                const bartender = await findBartender({ securityCode, token });
+
+                if (bartender) {
+                    return {
+                        data: [bartender],
+                    };
+                }
+
+                return new GraphQLError('Garçom não encontrado', {
+                    extensions: { code: 'NOT FOUND' },
+                });
+            } catch (error) {
+                throw new GraphQLError('Falha ao buscar garçom - ' + error, {
+                    extensions: { code: 'INTERNAL SERVER ERROR' },
+                });
+            }
+        },
+
         bartendersAreWaiting: async (_: any, __: any, context: GraphQLContext) => {
-            // await privateUserRouteAuth(context);
+            await privateUserRouteAuth(context);
             const jobs = await queue.getJobs(["waiting"]);
             console.log(jobs.map((job) => job.data.mensagem));
             return {
@@ -75,9 +99,9 @@ const bartenderResolver = {
     },
 
     Mutation: {
-        bartenderAccess: async (_: any, { input }: any, _context: GraphQLContext) => {
+        bartenderAccess: async (_: any, { input }: any, context: GraphQLContext) => {
             try {
-                // await privateUserRouteAuth(context);
+                await privateUserRouteAuth(context);
                 const { bartenderId, response } = input;
 
                 const bartender = await findBartender({ id: bartenderId });
@@ -109,8 +133,9 @@ const bartenderResolver = {
             }
         },
 
-        cancelAuthBartenderRequest: async (_: any, { input }: any, _context: GraphQLContext) => {
+        cancelAuthBartenderRequest: async (_: any, { input }: any, context: GraphQLContext) => {
             try {
+                await privateBartenderRouteAuth(context);
                 const { bartenderId } = input;
         
                 const bartender = await findBartender({ id: bartenderId });
