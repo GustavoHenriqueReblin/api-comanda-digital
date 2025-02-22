@@ -91,7 +91,6 @@ const bartenderResolver = {
         bartendersAreWaiting: async (_: any, __: any, context: GraphQLContext) => {
             await privateUserRouteAuth(context);
             const jobs = await queue.getJobs(["waiting"]);
-            console.log(jobs.map((job) => job.data.mensagem));
             return {
                 data: jobs.filter((job) => !!job.data.mensagem).map((job) => JSON.parse(job.data.mensagem)) as Bartender[],
             };

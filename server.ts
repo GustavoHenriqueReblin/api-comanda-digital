@@ -15,7 +15,7 @@ import cookieParser from "cookie-parser";
 import queue from './src/services/queue';
 
 const corsOptions = {
-    origin: ['https://studio.apollographql.com', 'http://localhost:3000'],
+    origin: ['https://studio.apollographql.com', 'http://localhost:3000', 'http://localhost:3001'],
     credentials: true,
 };
 

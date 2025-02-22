@@ -1,7 +1,7 @@
 import { fakeOrderData } from '../../model/orderModel';
 import { fakeOrderItemsData } from '../../model/orderItemsModel';
-import { nextId } from '../../helper';
 import pubsub from '../pubsub';
+import { nextId } from '../../helper';
 
 const orderResolver = {
     Query: {

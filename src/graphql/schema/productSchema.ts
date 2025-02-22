@@ -7,6 +7,7 @@ const productSchema = gql`
         name: String!
         price: Float!
         description: String
+        srcImg: String
     }
 
     input FilterInput {

@@ -13,10 +13,10 @@ import orderTypeSchema from './schema/orderSchema';
 
 const schema = {
     typeDefs: [
-        userTypeSchema, bartenderTypeSchema, //, categoryTypeSchema, productTypeSchema, tableTypeSchema, orderTypeSchema
+        userTypeSchema, bartenderTypeSchema, categoryTypeSchema, productTypeSchema, tableTypeSchema, orderTypeSchema
     ],
     resolvers: [
-        userResolver, bartenderResolver, // categoryResolver, productResolver, tableResolver, orderResolver
+        userResolver, bartenderResolver, categoryResolver, productResolver, tableResolver, orderResolver
     ],
 };
 

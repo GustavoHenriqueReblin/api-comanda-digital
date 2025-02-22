@@ -24,6 +24,7 @@ export type Product = {
     name: string,
     price: number,
     description: string
+    srcImg: string
 };
 
 export type Table = {
